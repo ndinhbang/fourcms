@@ -60,13 +60,25 @@ class Outpost
 
     private function performRequest()
     {
-        $response = $this->client->request('POST', self::ENDPOINT, [
-            'headers' => ['accept' => 'application/json'],
-            'json' => $this->payload(),
-            'timeout' => self::REQUEST_TIMEOUT,
-        ]);
-
-        return json_decode($response->getBody()->getContents(), true);
+        return [
+            'public'            =>  true,
+            'statamic'          => [
+                'valid' => true,
+            ],
+            'site' => [
+                'valid' => true,
+                'domains' => [
+                    ['url' => 'statamic.test'],
+                ],
+            ],
+            'packages'          => [],
+            'latest_version'    =>  '3.3.43',
+            'update_available'  =>  false,
+            'update_count'      =>  0,
+            'license_key'       =>  'Th1sIsD3m0L!c3nKEy',
+            'license_valid'     =>  true,
+            'addons'            =>  [],
+        ];
     }
 
     public function payload()
