@@ -1,0 +1,59 @@
+{
+    "name": "doublethreedigital/runway",
+    "description": "Use Eloquent in Statamic like never before.",
+    "license": "proprietary",
+    "autoload": {
+        "psr-4": {
+            "DoubleThreeDigital\\Runway\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "DoubleThreeDigital\\Runway\\Tests\\": "tests"
+        }
+    },
+    "extra": {
+        "statamic": {
+            "name": "Runway",
+            "description": "Use Eloquent in Statamic like never before."
+        },
+        "laravel": {
+            "providers": [
+                "DoubleThreeDigital\\Runway\\ServiceProvider"
+            ]
+        },
+        "download-dist": {
+            "url": "https://github.com/duncanmcclean/runway/releases/download/{$version}/dist.tar.gz",
+            "path": "resources/dist"
+        }
+    },
+    "require": {
+        "php": "^7.4 || ^8.0",
+        "friendsofphp/php-cs-fixer": "^3.0",
+        "pixelfear/composer-dist-plugin": "^0.1.5",
+        "statamic/cms": "3.2.* || 3.3.*"
+    },
+    "require-dev": {
+        "nunomaduro/collision": "^4.2 || ^5.0 || ^6.1",
+        "orchestra/testbench": "^5.0 || ^6.0 || ^7.0",
+        "spatie/test-time": "^1.2"
+    },
+    "scripts": {
+        "lint": [
+            "php-cs-fixer fix ./src"
+        ],
+        "test": [
+            "php -d memory_limit=-1 ./vendor/bin/phpunit"
+        ]
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "preferred-install": "dist",
+        "sort-packages": true,
+        "allow-plugins": {
+            "pixelfear/composer-dist-plugin": true,
+            "composer/package-versions-deprecated": true
+        }
+    },
+    "minimum-stability": "beta"
+}

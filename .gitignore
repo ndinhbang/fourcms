@@ -1,9 +1,10 @@
 /node_modules
 /public/hot
 /public/storage
-/public/vendor/statamic
+/public/img
+# /public/vendor/statamic
 /storage/*.key
-/vendor
+# /vendor
 .env
 .env.backup
 .phpunit.result.cache
