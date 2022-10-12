@@ -135,4 +135,5 @@ return array(
     'Archetype\\Tests\\' => array($vendorDir . '/ajthinking/archetype/tests'),
     'Archetype\\' => array($vendorDir . '/ajthinking/archetype/src'),
     'App\\' => array($baseDir . '/app'),
+    'Abi\\Article\\' => array($vendorDir . '/abi/article/src'),
 );

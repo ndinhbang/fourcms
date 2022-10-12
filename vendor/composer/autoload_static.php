@@ -322,6 +322,7 @@ class ComposerStaticInitd582194aef679303fc31021665bf3b86
             'Archetype\\Tests\\' => 16,
             'Archetype\\' => 10,
             'App\\' => 4,
+            'Abi\\Article\\' => 12,
         ),
     );
 
@@ -848,6 +849,10 @@ class ComposerStaticInitd582194aef679303fc31021665bf3b86
         array (
             0 => __DIR__ . '/../..' . '/app',
         ),
+        'Abi\\Article\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/abi/article/src',
+        ),
     );
 
     public static $prefixesPsr0 = array (
@@ -868,6 +873,7 @@ class ComposerStaticInitd582194aef679303fc31021665bf3b86
         'AMFReader' => __DIR__ . '/..' . '/james-heinrich/getid3/getid3/module.audio-video.flv.php',
         'AMFStream' => __DIR__ . '/..' . '/james-heinrich/getid3/getid3/module.audio-video.flv.php',
         'AVCSequenceParameterSetReader' => __DIR__ . '/..' . '/james-heinrich/getid3/getid3/module.audio-video.flv.php',
+        'Abi\\Article\\ServiceProvider' => __DIR__ . '/..' . '/abi/article/src/ServiceProvider.php',
         'App\\Console\\Kernel' => __DIR__ . '/../..' . '/app/Console/Kernel.php',
         'App\\Exceptions\\Handler' => __DIR__ . '/../..' . '/app/Exceptions/Handler.php',
         'App\\Http\\Controllers\\Controller' => __DIR__ . '/../..' . '/app/Http/Controllers/Controller.php',
@@ -880,6 +886,8 @@ class ComposerStaticInitd582194aef679303fc31021665bf3b86
         'App\\Http\\Middleware\\TrustHosts' => __DIR__ . '/../..' . '/app/Http/Middleware/TrustHosts.php',
         'App\\Http\\Middleware\\TrustProxies' => __DIR__ . '/../..' . '/app/Http/Middleware/TrustProxies.php',
         'App\\Http\\Middleware\\VerifyCsrfToken' => __DIR__ . '/../..' . '/app/Http/Middleware/VerifyCsrfToken.php',
+        'App\\Models\\Article' => __DIR__ . '/../..' . '/app/Models/Article.php',
+        'App\\Models\\ArticleCategory' => __DIR__ . '/../..' . '/app/Models/ArticleCategory.php',
         'App\\Models\\Test' => __DIR__ . '/../..' . '/app/Models/Test.php',
         'App\\Models\\User' => __DIR__ . '/../..' . '/app/Models/User.php',
         'App\\Providers\\AppServiceProvider' => __DIR__ . '/../..' . '/app/Providers/AppServiceProvider.php',
@@ -3325,6 +3333,7 @@ class ComposerStaticInitd582194aef679303fc31021665bf3b86
         'Illuminate\\Database\\Eloquent\\JsonEncodingException' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Database/Eloquent/JsonEncodingException.php',
         'Illuminate\\Database\\Eloquent\\MassAssignmentException' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Database/Eloquent/MassAssignmentException.php',
         'Illuminate\\Database\\Eloquent\\MassPrunable' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Database/Eloquent/MassPrunable.php',
+        'Illuminate\\Database\\Eloquent\\MissingAttributeException' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Database/Eloquent/MissingAttributeException.php',
         'Illuminate\\Database\\Eloquent\\Model' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Database/Eloquent/Model.php',
         'Illuminate\\Database\\Eloquent\\ModelNotFoundException' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Database/Eloquent/ModelNotFoundException.php',
         'Illuminate\\Database\\Eloquent\\Prunable' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Database/Eloquent/Prunable.php',
@@ -3651,6 +3660,11 @@ class ComposerStaticInitd582194aef679303fc31021665bf3b86
         'Illuminate\\Mail\\MailManager' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Mail/MailManager.php',
         'Illuminate\\Mail\\MailServiceProvider' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Mail/MailServiceProvider.php',
         'Illuminate\\Mail\\Mailable' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Mail/Mailable.php',
+        'Illuminate\\Mail\\Mailables\\Address' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Mail/Mailables/Address.php',
+        'Illuminate\\Mail\\Mailables\\Attachment' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Mail/Mailables/Attachment.php',
+        'Illuminate\\Mail\\Mailables\\Content' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Mail/Mailables/Content.php',
+        'Illuminate\\Mail\\Mailables\\Envelope' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Mail/Mailables/Envelope.php',
+        'Illuminate\\Mail\\Mailables\\Headers' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Mail/Mailables/Headers.php',
         'Illuminate\\Mail\\Mailer' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Mail/Mailer.php',
         'Illuminate\\Mail\\Markdown' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Mail/Markdown.php',
         'Illuminate\\Mail\\Message' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Mail/Message.php',
@@ -3795,6 +3809,8 @@ class ComposerStaticInitd582194aef679303fc31021665bf3b86
         'Illuminate\\Routing\\Controller' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Routing/Controller.php',
         'Illuminate\\Routing\\ControllerDispatcher' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Routing/ControllerDispatcher.php',
         'Illuminate\\Routing\\ControllerMiddlewareOptions' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Routing/ControllerMiddlewareOptions.php',
+        'Illuminate\\Routing\\Controllers\\HasMiddleware' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Routing/Controllers/HasMiddleware.php',
+        'Illuminate\\Routing\\Controllers\\Middleware' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Routing/Controllers/Middleware.php',
         'Illuminate\\Routing\\CreatesRegularExpressionRouteConstraints' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Routing/CreatesRegularExpressionRouteConstraints.php',
         'Illuminate\\Routing\\Events\\RouteMatched' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Routing/Events/RouteMatched.php',
         'Illuminate\\Routing\\Events\\Routing' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Routing/Events/Routing.php',
