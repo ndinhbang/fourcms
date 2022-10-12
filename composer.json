@@ -10,6 +10,7 @@
     "type": "project",
     "require": {
         "php": "^8.0",
+        "abi/article": "dev-develop",
         "doctrine/dbal": "^3.4",
         "doublethreedigital/runway": "^2.5",
         "fruitcake/laravel-cors": "^2.0.5",
@@ -74,5 +75,11 @@
         "post-update-cmd": [
             "@php artisan vendor:publish --tag=laravel-assets --ansi --force"
         ]
-    }
+    },
+    "repositories": [
+        {
+            "type": "path",
+            "url": "addons/abi/article"
+        }
+    ]
 }
