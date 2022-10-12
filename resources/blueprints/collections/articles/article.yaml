@@ -1,0 +1,39 @@
+sections:
+  main:
+    display: Main
+    fields:
+      -
+        handle: title
+        field:
+          type: text
+          required: true
+          validate:
+            - required
+      -
+        handle: content
+        field:
+          type: markdown
+          localizable: true
+  sidebar:
+    display: Sidebar
+    fields:
+      -
+        handle: slug
+        field:
+          type: slug
+          localizable: true
+      -
+        handle: article_category_id
+        field:
+          max_items: 1
+          mode: default
+          resource: article_categories
+          create: false
+          display: Category
+          type: belongs_to
+          icon: belongs_to
+          listable: hidden
+          instructions_position: above
+          visibility: visible
+          always_save: false
+title: Article

@@ -12,6 +12,26 @@ return [
     */
 
     'resources' => [
+        \App\Models\Test::class => [
+            'name' => 'Tests',
+            'handle' => 'tests',
+            'collection' => 'tests',
+            'blueprint' => 'collections.tests.test',
+            'nav' => [
+                'section' => 'Bundles',
+            ],
+        ],
+        \App\Models\ArticleCategory::class => [
+            'name' => 'Article Categories',
+            'handle' => 'article_categories',
+            'blueprint' => 'collections.article_categories.article_category',
+        ],
+        \App\Models\Article::class => [
+            'name' => 'Articles',
+            'handle' => 'articles',
+            'blueprint' => 'collections.articles.article',
+        ],
+
         // \App\Models\Order::class => [
         //     'name' => 'Orders',
 

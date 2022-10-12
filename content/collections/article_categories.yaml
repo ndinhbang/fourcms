@@ -1,0 +1,5 @@
+title: 'Article Categories'
+revisions: false
+date_behavior:
+  past: public
+  future: private
