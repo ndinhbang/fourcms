@@ -4,16 +4,36 @@ namespace Abi\Article\Http\Controllers;
 
 use Abi\Article\Http\Requests\IndexRequest;
 use Carbon\CarbonInterface;
+use DoubleThreeDigital\Runway\Runway;
 use Statamic\CP\Breadcrumbs;
 use Statamic\Facades\Scope;
 use Statamic\Facades\User;
 use Statamic\Fields\Field;
 use Statamic\Http\Controllers\CP\CpController;
 
-class ResourceController extends CpController
+class CategoryController extends CpController
 {
     public function index(IndexRequest $request)
     {
+//        $resource = Runway::findResource($resourceHandle);
+//        $blueprint = $resource->blueprint();
+//
+//        $listingConfig = [
+//            'preferencesPrefix' => "runway.{$resource->handle()}",
+//            'requestUrl'        => cp_route('runway.listing-api', ['resourceHandle' => $resource->handle()]),
+//            'listingUrl'        => cp_route('runway.index', ['resourceHandle' => $resource->handle()]),
+//        ];
+//
+//        return view('runway::index', [
+//            'title'         => $resource->name(),
+//            'resource'      => $resource,
+//            'recordCount'   => $resource->model()->count(),
+//            'columns'       => $this->buildColumns($resource, $blueprint),
+//            'filters'       => Scope::filters("runway_{$resourceHandle}"),
+//            'listingConfig' => $listingConfig,
+//            'actionUrl'     => cp_route('runway.actions.run', ['resourceHandle' => $resourceHandle]),
+//        ]);
+
         return view('article::index', [
             'title'         => 'Article',
 //            'resource'      => $resource,
@@ -224,7 +244,7 @@ class ResourceController extends CpController
 //    }
 //
 //    /**
-//     * This method is a duplicate of code in the `ResourceListingController`.
+//     * This method is a duplicate of code in the `CategoryListingController`.
 //     * Update both if you make any changes.
 //     */
 //    protected function buildColumns(Resource $resource, $blueprint)

@@ -6,7 +6,7 @@ use DoubleThreeDigital\Runway\Runway;
 use Illuminate\Http\Request;
 use Statamic\Http\Controllers\CP\ActionController;
 
-class ResourceActionController extends ActionController
+class CategoryActionController extends ActionController
 {
     protected $resource;
 

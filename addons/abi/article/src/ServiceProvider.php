@@ -2,6 +2,7 @@
 
 namespace Abi\Article;
 
+use Abi\Article\Models\Article;
 use DoubleThreeDigital\Runway\Runway;
 use Statamic\Facades\CP\Nav;
 use Statamic\Facades\Permission;
@@ -32,6 +33,10 @@ class ServiceProvider extends AddonServiceProvider
     protected $scripts = [
 //        __DIR__ . '/../resources/dist/js/cp.js',
     ];
+
+//    protected $policies = [
+//        Article::class           => ArticlePolicy::class,
+//    ];
 
     public function bootAddon()
     {
