@@ -1,17 +1,18 @@
 <?php
 
-use Abi\Article\Http\Controllers\CategoryController;
+use Abi\Article\Http\Controllers\ArticleController;
 use Illuminate\Support\Facades\Route;
 
 Route::name('article.')->prefix('article')->group(function () {
-    Route::get('/', [CategoryController::class, 'index'])->name('index');
+    Route::get('/', [ArticleController::class, 'index'])->name('index');
+    Route::get('/create', [ArticleController::class, 'create'])->name('create');
+    Route::post('/create', [ArticleController::class, 'store'])->name('store');
+    Route::get('/{record}', [ArticleController::class, 'edit'])->name('edit');
+    Route::patch('/{record}', [ArticleController::class, 'update'])->name('update');
 
-//    Route::get('/{resourceHandle}/listing-api', [CategoryListingController::class, 'index'])->name('listing-api');
-//    Route::post('/{resourceHandle}/actions', [CategoryActionController::class, 'runAction'])->name('actions.run');
-//    Route::post('/{resourceHandle}/actions/list', [CategoryActionController::class, 'bulkActionsList'])->name('actions.bulk');
+//    Route::get('/{resourceHandle}/listing-api', [ArticleListingController::class, 'index'])->name('listing-api');
+//    Route::post('/{resourceHandle}/actions', [ArticleActionController::class, 'runAction'])->name('actions.run');
+//    Route::post('/{resourceHandle}/actions/list', [ArticleActionController::class, 'bulkActionsList'])->name('actions.bulk');
 //
-//    Route::get('/{resourceHandle}/create', [CategoryController::class, 'create'])->name('create');
-//    Route::post('/{resourceHandle}/create', [CategoryController::class, 'store'])->name('store');
-//    Route::get('/{resourceHandle}/{record}', [CategoryController::class, 'edit'])->name('edit');
-//    Route::patch('/{resourceHandle}/{record}', [CategoryController::class, 'update'])->name('update');
+
 });

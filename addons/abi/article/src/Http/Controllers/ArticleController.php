@@ -3,18 +3,55 @@
 namespace Abi\Article\Http\Controllers;
 
 use Abi\Article\Http\Requests\IndexRequest;
-use Carbon\CarbonInterface;
-use DoubleThreeDigital\Runway\Runway;
-use Statamic\CP\Breadcrumbs;
+use Statamic\Exceptions\NotFoundHttpException;
+use Statamic\Facades\Collection;
 use Statamic\Facades\Scope;
-use Statamic\Facades\User;
-use Statamic\Fields\Field;
 use Statamic\Http\Controllers\CP\CpController;
+use Statamic\Query\Scopes\Filters\Concerns\QueriesFilters;
 
-class CategoryController extends CpController
+class ArticleController extends CpController
 {
+    use QueriesFilters;
+
+    /**
+     * @throws \Throwable
+     */
     public function index(IndexRequest $request)
     {
+        $filters = Scope::filters('article', []);
+
+        $collectionHandle = config('article.collection');
+
+        throw_unless(
+            $collection = Collection::findByHandle($collectionHandle),
+            new NotFoundHttpException("Collection [$collectionHandle] not found.")
+        );
+
+        $query = \Abi\Article\Models\Article::query();
+
+        $activeFilterBadges = $this->queryFilters($query, $request->filters, [
+            'collection' => $collection->handle(),
+            'blueprints' => $collection->entryBlueprints()->map->handle(),
+        ]);
+
+        $sortField = request('sort');
+        $sortDirection = request('order', 'asc');
+
+        if (! $sortField && ! request('search')) {
+            $sortField = $collection->sortField();
+            $sortDirection = $collection->sortDirection();
+        }
+
+        if ($sortField) {
+            $query->orderBy($sortField, $sortDirection);
+        }
+
+        $entries = $query->paginate(request('perPage'));
+
+        return view('article::index', [
+            'filters' => $filters,
+            'title' => $collectionHandle,
+        ]);
 //        $resource = Runway::findResource($resourceHandle);
 //        $blueprint = $resource->blueprint();
 //
@@ -34,15 +71,15 @@ class CategoryController extends CpController
 //            'actionUrl'     => cp_route('runway.actions.run', ['resourceHandle' => $resourceHandle]),
 //        ]);
 
-        return view('article::index', [
-            'title'         => 'Article',
+//        return view('article::index', [
+//            'title'         => 'Article',
 //            'resource'      => $resource,
 //            'recordCount'   => $resource->model()->count(),
 //            'columns'       => $this->buildColumns($resource, $blueprint),
 //            'filters'       => Scope::filters("runway_{$resourceHandle}"),
 //            'listingConfig' => $listingConfig,
 //            'actionUrl'     => cp_route('runway.actions.run', ['resourceHandle' => $resourceHandle]),
-        ]);
+//        ]);
     }
 
 //    public function create(CreateRequest $request, $resourceHandle)
@@ -244,7 +281,7 @@ class CategoryController extends CpController
 //    }
 //
 //    /**
-//     * This method is a duplicate of code in the `CategoryListingController`.
+//     * This method is a duplicate of code in the `ArticleListingController`.
 //     * Update both if you make any changes.
 //     */
 //    protected function buildColumns(Resource $resource, $blueprint)

@@ -7,13 +7,13 @@
             "dist": {
                 "type": "path",
                 "url": "addons/abi/article",
-                "reference": "e5e1df166722334788b02230f9d333ce295eb019"
+                "reference": "dc5b2bf98a87d3e38c19f86c8692d8f9a6df6372"
             },
             "type": "library",
             "extra": {
                 "statamic": {
                     "name": "Article",
-                    "description": "Article addon"
+                    "description": "Article Addon"
                 },
                 "laravel": {
                     "providers": [

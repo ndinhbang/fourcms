@@ -3,7 +3,7 @@
         'name' => 'statamic/statamic',
         'pretty_version' => 'dev-develop',
         'version' => 'dev-develop',
-        'reference' => 'accf31af8b86308d2248b1aa035ab17b9d5b4800',
+        'reference' => '2365f8d00b0d7bdeef4eee29681260e68ded3fa2',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -13,7 +13,7 @@
         'abi/article' => array(
             'pretty_version' => 'dev-develop',
             'version' => 'dev-develop',
-            'reference' => 'e5e1df166722334788b02230f9d333ce295eb019',
+            'reference' => 'dc5b2bf98a87d3e38c19f86c8692d8f9a6df6372',
             'type' => 'library',
             'install_path' => __DIR__ . '/../abi/article',
             'aliases' => array(),
@@ -1274,7 +1274,7 @@
         'statamic/statamic' => array(
             'pretty_version' => 'dev-develop',
             'version' => 'dev-develop',
-            'reference' => 'accf31af8b86308d2248b1aa035ab17b9d5b4800',
+            'reference' => '2365f8d00b0d7bdeef4eee29681260e68ded3fa2',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

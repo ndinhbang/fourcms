@@ -69,30 +69,30 @@ abstract class EloquentEntryQueryBuilder extends EloquentQueryBuilder implements
         }
     }
 
-    public function get($columns = ['*'])
-    {
-        $this->addTaxonomyWheres();
+//    public function get($columns = ['*'])
+//    {
+//        $this->addTaxonomyWheres();
+//
+//        return parent::get($columns);
+//    }
+//
+//    public function paginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null)
+//    {
+//        $this->addTaxonomyWheres();
+//
+//        return parent::paginate($perPage, $columns, $pageName, $page);
+//    }
 
-        return parent::get($columns);
-    }
+//    public function count()
+//    {
+//        $this->addTaxonomyWheres();
+//
+//        return parent::count();
+//    }
 
-    public function paginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null)
-    {
-        $this->addTaxonomyWheres();
-
-        return parent::paginate($perPage, $columns, $pageName, $page);
-    }
-
-    public function count()
-    {
-        $this->addTaxonomyWheres();
-
-        return parent::count();
-    }
-
-    public function with($relations, $callback = null)
-    {
-        return $this;
-    }
+//    public function with($relations, $callback = null)
+//    {
+//        return $this;
+//    }
 
 }

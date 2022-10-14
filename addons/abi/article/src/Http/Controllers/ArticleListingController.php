@@ -10,7 +10,7 @@ use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Requests\FilteredRequest;
 use Statamic\Query\Scopes\Filters\Concerns\QueriesFilters;
 
-class CategoryListingController extends CpController
+class ArticleListingController extends CpController
 {
     use QueriesFilters;
 
@@ -73,7 +73,7 @@ class CategoryListingController extends CpController
     }
 
     /**
-     * This method is a duplicate of code in the `CategoryController`.
+     * This method is a duplicate of code in the `ArticleController`.
      * Update both if you make any changes.
      */
     protected function buildColumns(Resource $resource, $blueprint)

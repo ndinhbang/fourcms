@@ -7,6 +7,15 @@ use Statamic\Facades\User;
 
 class IndexRequest extends FormRequest
 {
+    protected function prepareForValidation()
+    {
+        if ($filters = $this->filters) {
+            $this->merge([
+                'filters' => collect(json_decode(base64_decode($filters), true)),
+            ]);
+        }
+    }
+
     public function authorize()
     {
         return User::current()->hasPermission("View articles")

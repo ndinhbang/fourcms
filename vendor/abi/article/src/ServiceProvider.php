@@ -9,20 +9,12 @@ use Statamic\Facades\Permission;
 use Statamic\Providers\AddonServiceProvider;
 use Statamic\Statamic;
 
+/**
+ * @see https://statamic.dev/extending/addons
+ */
 class ServiceProvider extends AddonServiceProvider
 {
-    protected $actions = [
-//        Actions\DeleteModel::class,
-    ];
-
-    protected $commands = [
-//        Console\Commands\GenerateBlueprint::class,
-    ];
-
-    protected $fieldtypes = [
-//        Fieldtypes\BelongsToFieldtype::class,
-//        Fieldtypes\HasManyFieldtype::class,
-    ];
+    protected $viewNamespace = 'article';
 
     protected $routes = [
         'cp' => __DIR__ . '/../routes/cp.php',
@@ -30,8 +22,16 @@ class ServiceProvider extends AddonServiceProvider
         'web' => __DIR__.'/../routes/web.php',
     ];
 
+    protected $commands = [
+        \Abi\Article\Commands\AssetLinkCommand::class,
+    ];
+
+//    protected $stylesheets = [
+//        __DIR__ . '/../resources/dist/css/cp.css',
+//    ];
+
     protected $scripts = [
-//        __DIR__ . '/../resources/dist/js/cp.js',
+        __DIR__ . '/../resources/dist/js/cp.js',
     ];
 
 //    protected $policies = [
@@ -40,19 +40,56 @@ class ServiceProvider extends AddonServiceProvider
 
     public function bootAddon()
     {
+        $this->loadTranslationsFrom(__DIR__.'/../resources/lang', 'article');
         $this->loadViewsFrom(__DIR__ . '/../resources/views', 'article');
         $this->mergeConfigFrom(__DIR__ . '/../config/article.php', 'article');
+        $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
 
-        $this->publishes([
-            __DIR__ . '/../config/article.php' => config_path('abi/article.php'),
-        ], 'abi');
+        $this->registerPermissions();
+        $this->registerNavigation();
+
+        if ($this->app->runningInConsole()) {
+            // config
+            $this->publishes([
+                __DIR__ . '/../config/article.php' => config_path('abi/article.php'),
+            ], 'article-config');
+
+            // Lang
+            $this->publishes([
+                __DIR__.'/../database/migrations' => base_path('database/migrations'),
+            ], 'article-migrations');
+
+            // Assets
+//            $this->publishes([
+//                __DIR__.'/../resources/dist/css' => public_path('vendor/article/css'),
+//            ], 'article-assets');
+            $this->publishes([
+                __DIR__.'/../resources/dist/js' => public_path('vendor/article/js'),
+            ], 'article-assets');
+
+            // Blueprints
+            $this->publishes([
+                __DIR__.'/../resources/blueprints' => resource_path('blueprints'),
+            ], 'article-blueprints');
+
+            // Collections
+            $this->publishes([
+                __DIR__.'/../resources/collections' => base_path('content/collections'),
+            ], 'article-collections');
+
+            // Views
+            $this->publishes([
+                __DIR__.'/../resources/views' => resource_path('views/vendor/article'),
+            ], 'article-views');
+
+            // Lang
+            $this->publishes([
+                __DIR__.'/../resources/lang' => resource_path('lang/vendor/article'),
+            ], 'article-lang');
+        }
 
 //        Statamic::booted(function () {
 //            Runway::discoverResources();
-
-            $this->registerPermissions();
-            $this->registerNavigation();
-
 //            if (Runway::usesRouting()) {
 //                $this->app->get(\Statamic\Contracts\Data\DataRepository::class)
 //                    ->setRepository('runway-resources', Routing\ResourceRoutingRepository::class);
@@ -62,14 +99,21 @@ class ServiceProvider extends AddonServiceProvider
 
     protected function registerPermissions()
     {
-        Permission::register("View artices", function ($permission) {
-            $permission->children([
-                Permission::make("Edit artices")->children([
-                    Permission::make("Create new artices"),
-                    Permission::make("Delete artices"),
-                ]),
-            ]);
-        })->group('article');
+        Permission::group('articles', __('article::cp.single_name'), function () {
+            Permission::register('articles.view', function ($permission) {
+                $permission
+                    ->label(__('article::permissions.view'))
+//                    ->description(__('butik::cp.permission_view_orders_description'))
+                    ->children([
+                        Permission::make('articles.create')
+                            ->label(__('article::permissions.create')),
+                        Permission::make('articles.update')
+                            ->label(__('article::permissions.update')),
+                        Permission::make('articles.delete')
+                            ->label(__('article::permissions.delete')),
+                    ]);
+            });
+        });
     }
 
     protected function registerNavigation()
