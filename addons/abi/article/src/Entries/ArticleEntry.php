@@ -6,6 +6,7 @@ use Abi\Article\Models\Article;
 use Abi\Article\Repositories\ArticleEntryRepository;
 use App\Entries\Base\EloquentEntry;
 use Illuminate\Database\Eloquent\Model;
+use Statamic\Statamic;
 
 class ArticleEntry extends EloquentEntry
 {
@@ -30,7 +31,7 @@ class ArticleEntry extends EloquentEntry
             'origin_id'  => $this->origin()?->id(),
             'site'       => $this->locale(),
             'slug'       => $this->slug(),
-            'uri'        => $this->uri(),
+//            'uri'        => $this->uri(),
             'date'       => $this->hasDate() ? $this->date() : null,
             'collection' => $this->collectionHandle(),
             'data'       => $data->except(ArticleEntryQueryBuilder::COLUMNS),
@@ -43,6 +44,59 @@ class ArticleEntry extends EloquentEntry
     public function repository()
     {
         return app(ArticleEntryRepository::class);
+    }
+
+    public function editUrl()
+    {
+        return $this->cpUrl('article.edit');
+    }
+
+    public function updateUrl()
+    {
+        return $this->cpUrl('article.update');
+    }
+
+    public function publishUrl()
+    {
+        return $this->cpUrl('article.published.store');
+    }
+
+    public function unpublishUrl()
+    {
+        return $this->cpUrl('article.published.destroy');
+    }
+
+    public function revisionsUrl()
+    {
+        return $this->cpUrl('article.revisions.index');
+    }
+
+    public function createRevisionUrl()
+    {
+        return $this->cpUrl('article.revisions.store');
+    }
+
+    public function restoreRevisionUrl()
+    {
+        return $this->cpUrl('article.restore-revision');
+    }
+
+    public function apiUrl()
+    {
+        if (! $id = $this->id()) {
+            return null;
+        }
+
+        return Statamic::apiRoute('article.show', [$id]);
+    }
+
+    protected function cpUrl($route)
+    {
+        if (! $id = $this->id()) {
+            return null;
+        }
+
+        return cp_route($route, [$id]);
     }
 
 }

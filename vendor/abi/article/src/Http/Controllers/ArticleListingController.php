@@ -2,7 +2,7 @@
 
 namespace DoubleThreeDigital\Runway\Http\Controllers;
 
-use DoubleThreeDigital\Runway\Http\Resources\ResourceCollection;
+use DoubleThreeDigital\Runway\Http\Resources\ArticleCollection;
 use DoubleThreeDigital\Runway\Resource;
 use DoubleThreeDigital\Runway\Runway;
 use Statamic\Facades\User;
@@ -63,7 +63,7 @@ class ArticleListingController extends CpController
 
         $columns = $this->buildColumns($resource, $blueprint);
 
-        return (new ResourceCollection($results))
+        return (new ArticleCollection($results))
             ->setResourceHandle($resourceHandle)
             ->setColumnPreferenceKey('runway.' . $resourceHandle . '.columns')
             ->setColumns($columns)

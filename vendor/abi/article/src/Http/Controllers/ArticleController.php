@@ -2,19 +2,29 @@
 
 namespace Abi\Article\Http\Controllers;
 
+use Abi\Article\Facades\ArticleEntry;
 use Abi\Article\Http\Requests\IndexRequest;
+use Abi\Article\Http\Resources\ArticleCollection;
+use Abi\Article\Http\Resources\ArticleResource;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
+use Illuminate\Validation\ValidationException;
 use LogicException;
 use Statamic\Contracts\Entries\Entry as EntryContract;
 use Statamic\CP\Breadcrumbs;
 use Statamic\Exceptions\CollectionNotFoundException;
 use Statamic\Exceptions\SiteNotFoundException;
 use Statamic\Facades\Blueprint;
+use Statamic\Facades\Entry;
 use Statamic\Facades\Scope;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
+use Statamic\Http\Requests\FilteredRequest;
+use Statamic\Http\Resources\CP\Entries\Entries;
+use Statamic\Http\Resources\CP\Entries\Entry as EntryResource;
 use Statamic\Query\Scopes\Filters\Concerns\QueriesFilters;
+use Statamic\Support\Str;
 
 class ArticleController extends CpController
 {
@@ -97,8 +107,7 @@ class ArticleController extends CpController
 
 
 
-        $count = \Abi\Article\Models\Article::query()->count();
-
+        $count = ArticleEntry::query()->count();
         if ($count === 0) {
             return view('article::empty', $viewData);
         }
@@ -113,6 +122,54 @@ class ArticleController extends CpController
             'structure' => $structure,
             'expectsRoot' => $structure->expectsRoot(),
         ]));
+    }
+
+    public function list(FilteredRequest $request)
+    {
+//        $this->authorize('view', $collection);
+
+        $query = $this->indexQuery($this->collection);
+
+        $activeFilterBadges = $this->queryFilters($query, $request->filters, [
+            'collection' => $this->collection->handle(),
+            'blueprints' => $this->collection->entryBlueprints()->map->handle(),
+        ]);
+
+        $sortField = request('sort');
+        $sortDirection = request('order', 'asc');
+
+        if (! $sortField && ! request('search')) {
+            $sortField = $this->collection->sortField();
+            $sortDirection = $this->collection->sortDirection();
+        }
+
+        if ($sortField) {
+            $query->orderBy($sortField, $sortDirection);
+        }
+
+        $entries = $query->paginate(request('perPage'));
+
+        return (new ArticleCollection($entries))
+            ->blueprint($this->collection->entryBlueprint())
+            ->columnPreferenceKey("collections.{$this->collection->handle()}.columns")
+            ->additional(['meta' => [
+                'activeFilterBadges' => $activeFilterBadges,
+            ]]);
+    }
+
+    protected function indexQuery($collection)
+    {
+//        $query = $collection->queryEntries();
+        $query = ArticleEntry::query();
+        if ($search = request('search')) {
+            if ($collection->hasSearchIndex()) {
+                return $collection->searchIndex()->ensureExists()->search($search);
+            }
+
+            $query->where('title', 'like', '%'.$search.'%');
+        }
+
+        return $query;
     }
 
 
@@ -215,45 +272,139 @@ class ArticleController extends CpController
         ]);
     }
 //
-//    public function store(StoreRequest $request, $resourceHandle)
-//    {
-//        $postCreatedHooks = [];
-//
-//        $resource = Runway::findResource($resourceHandle);
-//        $record = $resource->model();
-//
-//        foreach ($resource->blueprint()->fields()->all() as $fieldKey => $field) {
-//            $processedValue = $field->fieldtype()->process($request->get($fieldKey));
-//
-//            if ($field->type() === 'section' || $field->type() === 'has_many') {
-//                if ($field->type() === 'has_many' && $processedValue) {
-//                    $postCreatedHooks[] = $processedValue;
-//                }
-//
-//                continue;
-//            }
-//
-//            if (is_array($processedValue) && ! $record->hasCast($fieldKey, ['array', 'collection', 'object', 'encrypted:array', 'encrypted:collection', 'encrypted:object'])) {
-//                $processedValue = json_encode($processedValue);
-//            }
-//
-//            $record->{$fieldKey} = $processedValue;
+
+    /**
+     * @throws ValidationException
+     */
+    public function store(Request $request, $site)
+    {
+//        $this->authorize('store', [EntryContract::class, $collection]);
+
+        $blueprint = $this->collection->entryBlueprint($request->_blueprint);
+
+        $data = $request->all();
+
+//        if (User::current()->cant('edit-other-authors-entries', [EntryContract::class, $collection, $blueprint])) {
+//            $data['author'] = [User::current()->id()];
 //        }
-//
-//        $record->save();
-//
-//        foreach ($postCreatedHooks as $postCreatedHook) {
-//            $postCreatedHook($resource, $record);
-//        }
-//
-//        return [
-//            'data' => $this->getReturnData($resource, $record),
-//            'redirect' => cp_route('runway.edit', [
-//                'resourceHandle'  => $resource->handle(),
-//                'record' => $record->{$resource->routeKey()},
-//            ]),
-//        ];
-//    }
+
+        $fields = $blueprint
+            ->ensureField('published', ['type' => 'toggle'])
+            ->fields()
+            ->addValues($data);
+
+        $fields
+            ->validator()
+            ->withRules(ArticleEntry::createRules($this->collection, $site))
+            ->withReplacements([
+                'collection' => $this->collection->handle(),
+                'site' => $site->handle(),
+            ])->validate();
+
+        $values = $fields->process()->values()->except([
+            'slug',
+            'date',
+            'blueprint',
+            'published'
+        ]);
+
+        $entry = ArticleEntry::make()
+            ->collection($this->collection)
+            ->blueprint($request->_blueprint)
+            ->locale($site->handle())
+            ->published($request->get('published'))
+            ->slug($this->resolveSlug($request))
+            ->data($values);
+
+        if ($this->collection->dated()) {
+            $entry->date($this->toCarbonInstanceForSaving($request->date));
+        }
+
+        if (($structure = $this->collection->structure()) && ! $this->collection->orderable()) {
+            $tree = $structure->in($site->handle());
+            $parent = $values['parent'] ?? null;
+            $entry->afterSave(function ($entry) use ($parent, $tree) {
+                $tree->appendTo($parent, $entry)->save();
+            });
+        }
+
+//        $this->validateUniqueUri($entry, $tree ?? null, $parent ?? null);
+
+        if ($entry->revisionsEnabled()) {
+            $entry->store([
+                'message' => $request->message,
+                'user' => User::current(),
+            ]);
+        } else {
+            $entry->updateLastModified(User::current())->save();
+        }
+
+        return new ArticleResource($entry);
+    }
+
+    protected function toCarbonInstanceForSaving($date): Carbon
+    {
+        // Since assume `Y-m-d ...` format, we can use `parse` here.
+        return Carbon::parse($date);
+    }
+
+    private function resolveSlug($request): \Closure
+    {
+        return function ($entry) use ($request) {
+            if ($request->slug) {
+                return $request->slug;
+            }
+
+            if ($entry->blueprint()->hasField('slug')) {
+                return Str::slug($request->title ?? $entry->autoGeneratedTitle());
+            }
+
+            return null;
+        };
+    }
+
+    private function entryUri($entry, $tree, $parent)
+    {
+        if (! $entry->route()) {
+            return null;
+        }
+
+        if (! $tree) {
+            return $entry->uri();
+        }
+
+        $parent = $parent ? $tree->page($parent) : null;
+
+        return app(\Statamic\Contracts\Routing\UrlBuilder::class)
+            ->content($entry)
+            ->merge([
+                'parent_uri' => $parent ? $parent->uri() : null,
+                'slug' => $entry->slug(),
+                // 'depth' => '', // todo
+                'is_root' => false,
+            ])
+            ->build($entry->route());
+    }
+
+
+    /**
+     * @throws ValidationException
+     */
+    private function validateUniqueUri($entry, $tree, $parent)
+    {
+        if (! $uri = $this->entryUri($entry, $tree, $parent)) {
+            return;
+        }
+
+        $existing = ArticleEntry::findByUri($uri, $entry->locale());
+
+        if (! $existing || $existing->id() === $entry->id()) {
+            return;
+        }
+
+        throw ValidationException::withMessages(['slug' => __('statamic::validation.unique_uri')]);
+    }
+
 //
 //    public function edit(EditRequest $request, $resourceHandle, $record)
 //    {

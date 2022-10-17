@@ -2,12 +2,9 @@
 
 namespace App\Entries\Base;
 
-use Abi\Article\Repositories\ArticleEntryRepository;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
-use Statamic\Contracts\Entries\Entry as EntryContract;
 use Statamic\Entries\Entry as FileEntry;
-use Statamic\Events\EntryDeleted;
 
 abstract class EloquentEntry extends FileEntry
 {
