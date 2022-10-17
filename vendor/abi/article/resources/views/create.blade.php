@@ -1,18 +1,25 @@
 @extends('statamic::layout')
-@section('title', "Create {$resource->singular()}")
+@section('title', $breadcrumbs->title($collectionCreateLabel))
 @section('wrapper_class', 'max-w-3xl')
 
 @section('content')
-    <runway-publish-form
+    <article-create-form
+        :actions="{{ json_encode($actions) }}"
+        collection-handle="{{ $collection }}"
+        collection-create-label="{{ $collectionCreateLabel }}"
+        :collection-has-routes="{{ Statamic\Support\Str::bool($collectionHasRoutes) }}"
+        :fieldset="{{ json_encode($blueprint) }}"
+        :values="{{ json_encode($values) }}"
+        :meta="{{ json_encode($meta) }}"
+        :published="{{ json_encode($published) }}"
+        :localizations="{{ json_encode($localizations) }}"
+        :revisions="{{ Statamic\Support\Str::bool($revisionsEnabled ) }}"
         :breadcrumbs="{{ $breadcrumbs->toJson() }}"
-        :initial-blueprint='@json($blueprint)'
-        :initial-meta='@json($meta)'
-        :initial-values='@json($values)'
-        initial-title="{{ $title }}"
-        action="{{ $action }}"
-        method="{{ $method }}"
-        :resource-has-routes="{{ $resourceHasRoutes ? 'true' : 'false' }}"
-        :is-creating="true"
-        publish-container="base"
-    ></runway-publish-form>
+        site="{{ $locale }}"
+        create-another-url="{{ cp_route('article.create', [$locale, 'blueprint' => $blueprint['handle'], 'parent' => $values['parent'] ?? null]) }}"
+        listing-url="{{ cp_route('article.index') }}"
+        :can-manage-publish-state="{{ Statamic\Support\Str::bool($canManagePublishState) }}"
+        :preview-targets="{{ json_encode($previewTargets) }}"
+    ></article-create-form>
+
 @endsection

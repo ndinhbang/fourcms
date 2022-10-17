@@ -44,10 +44,16 @@ use Illuminate\Support\Facades\Route;
 
 Route::name('article.')->prefix('article')->group(function () {
     Route::get('/', [ArticleController::class, 'index'])->name('index');
+    Route::get('/list', [ArticleController::class, 'list'])->name('list');
     Route::get('/create/{site}', [ArticleController::class, 'create'])->name('create');
-    Route::post('/create', [ArticleController::class, 'store'])->name('store');
-    Route::get('/{record}', [ArticleController::class, 'edit'])->name('edit');
-    Route::patch('/{record}', [ArticleController::class, 'update'])->name('update');
+    Route::post('create/{site}/preview', [\Abi\Aricle\Http\Controllers\ArticlePreviewController::class, 'create'])->name('preview.create');
+    Route::post('/{site}', [ArticleController::class, 'store'])->name('store');
+
+    Route::get('/{id}', [ArticleController::class, 'edit'])->name('edit');
+    Route::patch('/{id}', [ArticleController::class, 'update'])->name('update');
+
+//    Route::get('/{record}', [ArticleController::class, 'edit'])->name('edit');
+//    Route::patch('/{record}', [ArticleController::class, 'update'])->name('update');
 
 //    Route::get('/{resourceHandle}/listing-api', [ArticleListingController::class, 'index'])->name('listing-api');
 //    Route::post('/{resourceHandle}/actions', [ArticleActionController::class, 'runAction'])->name('actions.run');

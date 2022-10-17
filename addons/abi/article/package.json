@@ -11,7 +11,10 @@
     "dependencies": {
         "@shopify/draggable": "^1.0.0-beta.8",
         "axios": "^0.21.2",
-        "vue": "^2.6.11"
+        "marked": "^4.1.1",
+        "tree-helper": "^1.4.14",
+        "vue": "^2.6.11",
+        "vue-draggable-nested-tree": "^3.0.0-beta3"
     },
     "devDependencies": {
         "cross-env": "^5.2.1",

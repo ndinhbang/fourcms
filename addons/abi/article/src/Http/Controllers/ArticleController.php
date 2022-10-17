@@ -4,8 +4,11 @@ namespace Abi\Article\Http\Controllers;
 
 use Abi\Article\Http\Requests\IndexRequest;
 use Illuminate\Http\Request;
+use LogicException;
 use Statamic\Contracts\Entries\Entry as EntryContract;
+use Statamic\CP\Breadcrumbs;
 use Statamic\Exceptions\CollectionNotFoundException;
+use Statamic\Exceptions\SiteNotFoundException;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Scope;
 use Statamic\Facades\Site;
@@ -43,61 +46,73 @@ class ArticleController extends CpController
      */
     public function index(IndexRequest $request)
     {
-        $filters = Scope::filters('article', []);
+//        $this->authorize('view', $collection, __('You are not authorized to view this collection.'));
 
-        $query = \Abi\Article\Models\Article::query();
+        $blueprints = $this->collection
+            ->entryBlueprints()
+            ->reject->hidden()
+            ->map(function ($blueprint) {
+                return [
+                    'handle' => $blueprint->handle(),
+                    'title' => $blueprint->title(),
+                ];
+            })->values();
 
-        $activeFilterBadges = $this->queryFilters($query, $request->filters, [
-            'collection' => $this->collection->handle(),
-            'blueprints' =>  $this->collection->entryBlueprints()->map->handle(),
-        ]);
+        $site = $request->site ? Site::get($request->site) : Site::selected();
 
-        $sortField = request('sort');
-        $sortDirection = request('order', 'asc');
+        $blueprint = $this->collection->entryBlueprint();
 
-        if (! $sortField && ! request('search')) {
-            $sortField = $this->collection->sortField();
-            $sortDirection = $this->collection->sortDirection();
+        if (! $blueprint) {
+            throw new LogicException("The {$this->collection->handle()} collection does not have any visible blueprints. At least one must not be hidden.");
         }
 
-        if ($sortField) {
-            $query->orderBy($sortField, $sortDirection);
+        $columns = $blueprint
+            ->columns()
+            ->setPreferred("collections.{$this->collection->handle()}.columns")
+            ->rejectUnlisted()
+            ->values();
+
+        $viewData = [
+            'collection' => $this->collection,
+            'blueprints' => $blueprints,
+            'site' => $site->handle(),
+            'columns' => $columns,
+            'filters' => Scope::filters('entries', [
+                'collection' => $this->collection->handle(),
+                'blueprints' => $blueprints->pluck('handle')->all(),
+            ]),
+            'sites' => $this->collection->sites()->map(function ($site_handle) {
+                $site = Site::get($site_handle);
+
+                if (! $site) {
+                    throw new SiteNotFoundException($site_handle);
+                }
+
+                return [
+                    'handle' => $site->handle(),
+                    'name' => $site->name(),
+                ];
+            })->values()->all(),
+        ];
+
+
+
+        $count = \Abi\Article\Models\Article::query()->count();
+
+        if ($count === 0) {
+            return view('article::empty', $viewData);
         }
 
-        $entries = $query->paginate(request('perPage'));
+        if (! $this->collection->hasStructure()) {
+            return view('article::index', $viewData);
+        }
 
-        return view('article::index', [
-            'filters' => $filters,
-            'title' => $this->collection->handle(),
-        ]);
-//        $resource = Runway::findResource($resourceHandle);
-//        $blueprint = $resource->blueprint();
-//
-//        $listingConfig = [
-//            'preferencesPrefix' => "runway.{$resource->handle()}",
-//            'requestUrl'        => cp_route('runway.listing-api', ['resourceHandle' => $resource->handle()]),
-//            'listingUrl'        => cp_route('runway.index', ['resourceHandle' => $resource->handle()]),
-//        ];
-//
-//        return view('runway::index', [
-//            'title'         => $resource->name(),
-//            'resource'      => $resource,
-//            'recordCount'   => $resource->model()->count(),
-//            'columns'       => $this->buildColumns($resource, $blueprint),
-//            'filters'       => Scope::filters("runway_{$resourceHandle}"),
-//            'listingConfig' => $listingConfig,
-//            'actionUrl'     => cp_route('runway.actions.run', ['resourceHandle' => $resourceHandle]),
-//        ]);
+        $structure = $this->collection->structure();
 
-//        return view('article::index', [
-//            'title'         => 'Article',
-//            'resource'      => $resource,
-//            'recordCount'   => $resource->model()->count(),
-//            'columns'       => $this->buildColumns($resource, $blueprint),
-//            'filters'       => Scope::filters("runway_{$resourceHandle}"),
-//            'listingConfig' => $listingConfig,
-//            'actionUrl'     => cp_route('runway.actions.run', ['resourceHandle' => $resourceHandle]),
-//        ]);
+        return view('article::index', array_merge($viewData, [
+            'structure' => $structure,
+            'expectsRoot' => $structure->expectsRoot(),
+        ]));
     }
 
 
@@ -109,7 +124,7 @@ class ArticleController extends CpController
     {
 //        $this->authorize('create', [EntryContract::class, $collection]);
 
-        $blueprint = $this->collection->entryBlueprint(config('article.blueprint'));
+        $blueprint = $this->collection->entryBlueprint($request->blueprint);
 
         if (! $blueprint) {
             throw new \Exception(__('A valid blueprint is required.'));
@@ -143,8 +158,8 @@ class ArticleController extends CpController
         $viewData = [
             'title' => $this->collection->createLabel(),
             'actions' => [
-                'save' => cp_route('collections.entries.store', [
-                    $this->collection->handle(), $site->handle()
+                'save' => cp_route('article.store', [
+                   $site->handle()
                 ]),
             ],
             'values' => $values->all(),
@@ -162,14 +177,12 @@ class ArticleController extends CpController
                     'active' => $handle === $site->handle(),
                     'exists' => false,
                     'published' => false,
-                    'url' => cp_route('collections.entries.create', [
-                        $this->collection->handle(),
+                    'url' => cp_route('article.create', [
                         $handle,
                         'blueprint' => $blueprint->handle()
                     ]),
                     'livePreviewUrl' => $this->collection->route($handle)
-                        ? cp_route('collections.entries.preview.create', [
-                            $this->collection->handle(),
+                        ? cp_route('article.preview.create', [
                             $handle
                         ])
                         : null,
@@ -186,6 +199,20 @@ class ArticleController extends CpController
         }
 
         return view('article::create', $viewData);
+    }
+
+    protected function breadcrumbs($collection)
+    {
+        return new Breadcrumbs([
+            [
+                'text' => __('Collections'),
+                'url' => cp_route('collections.index'),
+            ],
+            [
+                'text' => $collection->title(),
+                'url' => $collection->showUrl(),
+            ],
+        ]);
     }
 //
 //    public function store(StoreRequest $request, $resourceHandle)
