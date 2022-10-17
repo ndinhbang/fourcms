@@ -17,7 +17,4 @@ class ArticleEntryQueryBuilder extends EloquentEntryQueryBuilder
         return ArticleEntry::class;
     }
 
-
-
-
 }

@@ -3,9 +3,13 @@
 namespace Abi\Article\Http\Controllers;
 
 use Abi\Article\Http\Requests\IndexRequest;
-use Statamic\Exceptions\NotFoundHttpException;
-use Statamic\Facades\Collection;
+use Illuminate\Http\Request;
+use Statamic\Contracts\Entries\Entry as EntryContract;
+use Statamic\Exceptions\CollectionNotFoundException;
+use Statamic\Facades\Blueprint;
 use Statamic\Facades\Scope;
+use Statamic\Facades\Site;
+use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Query\Scopes\Filters\Concerns\QueriesFilters;
 
@@ -14,32 +18,46 @@ class ArticleController extends CpController
     use QueriesFilters;
 
     /**
+     * @var \Statamic\Entries\Collection|null
+     */
+    protected $collection;
+
+    /**
+     * @throws \Throwable
+     */
+    public function __construct(Request $request)
+    {
+        parent::__construct($request);
+
+        $collectionHandle = config('article.collection');
+
+        throw_unless(
+            $this->collection = \Statamic\Facades\Collection::findByHandle($collectionHandle),
+            new CollectionNotFoundException($collectionHandle)
+        );
+    }
+
+    /**
+     * @see \Statamic\Http\Controllers\CP\Collections\CollectionsController::show
      * @throws \Throwable
      */
     public function index(IndexRequest $request)
     {
         $filters = Scope::filters('article', []);
 
-        $collectionHandle = config('article.collection');
-
-        throw_unless(
-            $collection = Collection::findByHandle($collectionHandle),
-            new NotFoundHttpException("Collection [$collectionHandle] not found.")
-        );
-
         $query = \Abi\Article\Models\Article::query();
 
         $activeFilterBadges = $this->queryFilters($query, $request->filters, [
-            'collection' => $collection->handle(),
-            'blueprints' => $collection->entryBlueprints()->map->handle(),
+            'collection' => $this->collection->handle(),
+            'blueprints' =>  $this->collection->entryBlueprints()->map->handle(),
         ]);
 
         $sortField = request('sort');
         $sortDirection = request('order', 'asc');
 
         if (! $sortField && ! request('search')) {
-            $sortField = $collection->sortField();
-            $sortDirection = $collection->sortDirection();
+            $sortField = $this->collection->sortField();
+            $sortDirection = $this->collection->sortDirection();
         }
 
         if ($sortField) {
@@ -50,7 +68,7 @@ class ArticleController extends CpController
 
         return view('article::index', [
             'filters' => $filters,
-            'title' => $collectionHandle,
+            'title' => $this->collection->handle(),
         ]);
 //        $resource = Runway::findResource($resourceHandle);
 //        $blueprint = $resource->blueprint();
@@ -82,40 +100,93 @@ class ArticleController extends CpController
 //        ]);
     }
 
-//    public function create(CreateRequest $request, $resourceHandle)
-//    {
-//        $resource = Runway::findResource($resourceHandle);
-//
-//        $blueprint = $resource->blueprint();
-//        $fields = $blueprint->fields();
-//        $fields = $fields->preProcess();
-//
-//        $viewData = [
-//            'title' => "Create {$resource->singular()}",
-//            'action' => cp_route('runway.store', ['resourceHandle' => $resource->handle()]),
-//            'method' => 'POST',
-//            'breadcrumbs' => new Breadcrumbs([
-//                [
-//                    'text' => $resource->plural(),
-//                    'url' => cp_route('runway.index', [
-//                        'resourceHandle' => $resource->handle(),
-//                    ]),
-//                ],
-//            ]),
-//            'resource' => $resource,
-//            'blueprint' => $blueprint->toPublishArray(),
-//            'values' => $fields->values(),
-//            'meta' => $fields->meta(),
-//            'permalink' => null,
-//            'resourceHasRoutes' => $resource->hasRouting(),
-//        ];
-//
-//        if ($request->wantsJson()) {
-//            return $viewData;
+
+    /**
+     * @see \Statamic\Http\Controllers\CP\Collections\EntriesController::create
+     * @throws \Exception
+     */
+    public function create(Request $request, $site)
+    {
+//        $this->authorize('create', [EntryContract::class, $collection]);
+
+        $blueprint = $this->collection->entryBlueprint(config('article.blueprint'));
+
+        if (! $blueprint) {
+            throw new \Exception(__('A valid blueprint is required.'));
+        }
+
+//        if (User::current()->cant('edit-other-authors-entries', [EntryContract::class, $collection, $blueprint])) {
+//            $blueprint->ensureFieldHasConfig('author', ['visibility' => 'read_only']);
 //        }
-//
-//        return view('runway::create', $viewData);
-//    }
+
+        $values = [];
+
+//        if ($this->collection->hasStructure() && $request->parent) {
+//            $values['parent'] = $request->parent;
+//        }
+
+        $fields = $blueprint
+            ->fields()
+            ->addValues($values)
+            ->preProcess();
+
+        $values = collect([
+            'title' => null,
+            'slug' => null,
+            'published' => $this->collection->defaultPublishState(),
+        ])->merge($fields->values());
+
+        if ($this->collection->dated()) {
+            $values['date'] = substr(now()->toDateTimeString(), 0, 10);
+        }
+
+        $viewData = [
+            'title' => $this->collection->createLabel(),
+            'actions' => [
+                'save' => cp_route('collections.entries.store', [
+                    $this->collection->handle(), $site->handle()
+                ]),
+            ],
+            'values' => $values->all(),
+            'meta' => $fields->meta(),
+            'collection' => $this->collection->handle(),
+            'collectionCreateLabel' => $this->collection->createLabel(),
+            'collectionHasRoutes' => ! is_null($this->collection->route($site->handle())),
+            'blueprint' => $blueprint->toPublishArray(),
+            'published' => $this->collection->defaultPublishState(),
+            'locale' => $site->handle(),
+            'localizations' => $this->collection->sites()->map(function ($handle) use ($site, $blueprint) {
+                return [
+                    'handle' => $handle,
+                    'name' => Site::get($handle)->name(),
+                    'active' => $handle === $site->handle(),
+                    'exists' => false,
+                    'published' => false,
+                    'url' => cp_route('collections.entries.create', [
+                        $this->collection->handle(),
+                        $handle,
+                        'blueprint' => $blueprint->handle()
+                    ]),
+                    'livePreviewUrl' => $this->collection->route($handle)
+                        ? cp_route('collections.entries.preview.create', [
+                            $this->collection->handle(),
+                            $handle
+                        ])
+                        : null,
+                ];
+            })->all(),
+            'revisionsEnabled' => $this->collection->revisionsEnabled(),
+            'breadcrumbs' => $this->breadcrumbs($this->collection),
+            'canManagePublishState' => User::current()->can('publish '.$this->collection->handle().' entries'),
+            'previewTargets' => $this->collection->previewTargets()->all(),
+        ];
+
+        if ($request->wantsJson()) {
+            return collect($viewData);
+        }
+
+        return view('article::create', $viewData);
+    }
 //
 //    public function store(StoreRequest $request, $resourceHandle)
 //    {
