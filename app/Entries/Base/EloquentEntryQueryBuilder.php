@@ -6,11 +6,11 @@ use Illuminate\Support\Str;
 use Statamic\Contracts\Entries\QueryBuilder;
 use Statamic\Entries\EntryCollection;
 use Statamic\Query\EloquentQueryBuilder;
-use Statamic\Stache\Query\QueriesTaxonomizedEntries;
+//use Statamic\Stache\Query\QueriesTaxonomizedEntries;
 
 abstract class EloquentEntryQueryBuilder extends EloquentQueryBuilder implements QueryBuilder
 {
-    use QueriesTaxonomizedEntries;
+//    use QueriesTaxonomizedEntries;
 
     const COLUMNS = [
         'id',

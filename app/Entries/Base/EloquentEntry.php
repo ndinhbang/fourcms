@@ -8,7 +8,7 @@ use Statamic\Entries\Entry as FileEntry;
 
 abstract class EloquentEntry extends FileEntry
 {
-    protected ?Model $model;
+    protected $model;
 
     /**
      * The fromModel is used frequently by the query builder to convert an Eloquent model into a Statamic entry.
@@ -40,12 +40,12 @@ abstract class EloquentEntry extends FileEntry
      * where it's ready to be inserted into the database when an entry is saved
      * @return mixed
      */
-    abstract public function toModel(): Model;
+    abstract public function toModel();
 
     /**
      * A getter/setter for the model
      * @param $model
-     * @return $this|Model
+     * @return $this
      */
     public function model($model = null)
     {

@@ -11,7 +11,7 @@
         handle="{{ $collection->handle() }}"
         breadcrumb-url="{{ cp_route('article.index') }}"
         :can-create="@can('create', ['Statamic\Contracts\Entries\Entry', $collection]) true @else false @endcan"
-        create-url="{{ cp_route('article.create', [$collection->handle(), $site]) }}"
+        create-url="{{ cp_route('article.create', [$site]) }}"
         create-label="{{ $collection->createLabel() }}"
         :blueprints='@json($blueprints)'
         sort-column="{{ $collection->sortField() }}"

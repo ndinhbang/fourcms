@@ -84,7 +84,7 @@
 
         </header>
 
-        <entry-list
+        <article-list
             v-if="view === 'list'"
             ref="list"
             :collection="handle"

@@ -106,6 +106,8 @@
 
 <script>
 
+import { cp_url } from "../bootstrap/globals";
+
 export default {
 
     mixins: [Listing],
@@ -120,8 +122,8 @@ export default {
     data() {
         return {
             listingKey: 'entries',
-            preferencesPrefix: `collections.${this.collection}`,
-            requestUrl: cp_url(`collections/${this.collection}/entries`),
+            preferencesPrefix: `article`,
+            requestUrl: cp_url(`article/list`),
             currentSite: this.site,
             initialSite: this.site,
         }

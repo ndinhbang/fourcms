@@ -2,6 +2,7 @@
 
 namespace Abi\Article;
 
+use Abi\Article\Entries\ArticleEntryQueryBuilder;
 use Abi\Article\Models\Article;
 use DoubleThreeDigital\Runway\Runway;
 use Statamic\Facades\CP\Nav;
@@ -124,6 +125,18 @@ class ServiceProvider extends AddonServiceProvider
                 ->icon('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0.125 0.125 13.75 13.75" stroke-width="0.75" style="background-color: #ffffff0d"><g transform="matrix(0.9,0,0,0.9,0.7000000000000002,0.7000000000000002)"><g><line x1="13.5" y1="1" x2="9" y2="1" fill="none" stroke="#000000" stroke-linecap="round" stroke-linejoin="round"></line><line x1="13.5" y1="4" x2="9" y2="4" fill="none" stroke="#000000" stroke-linecap="round" stroke-linejoin="round"></line><line x1="13.5" y1="7" x2="9" y2="7" fill="none" stroke="#000000" stroke-linecap="round" stroke-linejoin="round"></line><line x1="13.5" y1="13" x2="0.5" y2="13" fill="none" stroke="#000000" stroke-linecap="round" stroke-linejoin="round"></line><line x1="13.5" y1="10" x2="0.5" y2="10" fill="none" stroke="#000000" stroke-linecap="round" stroke-linejoin="round"></line><rect x="0.5" y="1" width="6" height="6" rx="0.5" fill="none" stroke="#000000" stroke-linecap="round" stroke-linejoin="round"></rect></g></g></svg>')
                 ->route('article.index')
                 ->can("View artices");
+        });
+    }
+
+    /**
+     * Register any application services.
+     *
+     * @return void
+     */
+    public function register()
+    {
+        $this->app->bind(ArticleEntryQueryBuilder::class, function () {
+            return new ArticleEntryQueryBuilder(Article::query());
         });
     }
 }
