@@ -31,7 +31,7 @@ class ArticleEntry extends EloquentEntry
             'origin_id'  => $this->origin()?->id(),
             'site'       => $this->locale(),
             'slug'       => $this->slug(),
-//            'uri'        => $this->uri(),
+            'uri'        => $this->uri(),
             'date'       => $this->hasDate() ? $this->date() : null,
             'collection' => $this->collectionHandle(),
             'data'       => $data->except(ArticleEntryQueryBuilder::COLUMNS),

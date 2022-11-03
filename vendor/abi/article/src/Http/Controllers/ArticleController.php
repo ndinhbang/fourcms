@@ -10,7 +10,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Validation\ValidationException;
 use LogicException;
+use Statamic\Contracts\Entries\Entry as EntryContract;
 use Statamic\CP\Breadcrumbs;
+use Statamic\Exceptions\BlueprintNotFoundException;
 use Statamic\Exceptions\CollectionNotFoundException;
 use Statamic\Exceptions\SiteNotFoundException;
 use Statamic\Facades\Scope;
@@ -398,6 +400,94 @@ class ArticleController extends CpController
         }
 
         throw ValidationException::withMessages(['slug' => __('statamic::validation.unique_uri')]);
+    }
+
+    public function edit(Request $request, $collection, $entry)
+    {
+//        $this->authorize('view', $entry);
+
+        $entry = $entry->fromWorkingCopy();
+
+        $blueprint = $entry->blueprint();
+
+        if (! $blueprint) {
+            throw new BlueprintNotFoundException($entry->value('blueprint'), 'collections/'.$collection->handle());
+        }
+
+        $blueprint->setParent($entry);
+
+        if (User::current()->cant('edit-other-authors-entries', [EntryContract::class, $collection, $blueprint])) {
+            $blueprint->ensureFieldHasConfig('author', ['visibility' => 'read_only']);
+        }
+
+        [$values, $meta] = $this->extractFromFields($entry, $blueprint);
+
+        if ($hasOrigin = $entry->hasOrigin()) {
+            [$originValues, $originMeta] = $this->extractFromFields($entry->origin(), $blueprint);
+        }
+
+        $viewData = [
+            'title' => $entry->value('title'),
+            'reference' => $entry->reference(),
+            'editing' => true,
+            'actions' => [
+                'save' => $entry->updateUrl(),
+                'publish' => $entry->publishUrl(),
+                'unpublish' => $entry->unpublishUrl(),
+                'revisions' => $entry->revisionsUrl(),
+                'restore' => $entry->restoreRevisionUrl(),
+                'createRevision' => $entry->createRevisionUrl(),
+                'editBlueprint' => cp_route('collections.blueprints.edit', [$collection, $blueprint]),
+            ],
+            'values' => array_merge($values, ['id' => $entry->id()]),
+            'meta' => $meta,
+            'collection' => $collection->handle(),
+            'collectionHasRoutes' => ! is_null($collection->route($entry->locale())),
+            'blueprint' => $blueprint->toPublishArray(),
+            'readOnly' => User::current()->cant('edit', $entry),
+            'locale' => $entry->locale(),
+            'localizedFields' => $entry->data()->keys()->all(),
+            'isRoot' => $entry->isRoot(),
+            'hasOrigin' => $hasOrigin,
+            'originValues' => $originValues ?? null,
+            'originMeta' => $originMeta ?? null,
+            'permalink' => $entry->absoluteUrl(),
+            'localizations' => $collection->sites()->map(function ($handle) use ($entry) {
+                $localized = $entry->in($handle);
+                $exists = $localized !== null;
+
+                return [
+                    'handle' => $handle,
+                    'name' => Site::get($handle)->name(),
+                    'active' => $handle === $entry->locale(),
+                    'exists' => $exists,
+                    'root' => $exists ? $localized->isRoot() : false,
+                    'origin' => $exists ? $localized->id() === optional($entry->origin())->id() : null,
+                    'published' => $exists ? $localized->published() : false,
+                    'status' => $exists ? $localized->status() : null,
+                    'url' => $exists ? $localized->editUrl() : null,
+                    'livePreviewUrl' => $exists ? $localized->livePreviewUrl() : null,
+                ];
+            })->all(),
+            'hasWorkingCopy' => $entry->hasWorkingCopy(),
+            'preloadedAssets' => $this->extractAssetsFromValues($values),
+            'revisionsEnabled' => $entry->revisionsEnabled(),
+            'breadcrumbs' => $this->breadcrumbs($collection),
+            'canManagePublishState' => User::current()->can('publish', $entry),
+            'previewTargets' => $collection->previewTargets()->all(),
+        ];
+
+        if ($request->wantsJson()) {
+            return collect($viewData);
+        }
+
+        if ($request->has('created')) {
+            session()->now('success', __('Entry created'));
+        }
+
+        return view('statamic::entries.edit', array_merge($viewData, [
+            'entry' => $entry,
+        ]));
     }
 
 //
