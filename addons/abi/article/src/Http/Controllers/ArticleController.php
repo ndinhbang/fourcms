@@ -308,12 +308,16 @@ class ArticleController extends CpController
                 'site' => $site->handle(),
             ])->validate();
 
+        // here we get data after validated
         $values = $fields->process()->values()->except([
             'slug',
             'date',
             'blueprint',
             'published'
         ]);
+
+        // todo: customize logic to save data to db
+        // ex: take some data to save to pivot table
 
         $entry = ArticleEntry::make()
             ->collection($this->collection)
