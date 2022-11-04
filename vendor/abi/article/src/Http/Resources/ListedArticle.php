@@ -32,7 +32,6 @@ class ListedArticle extends JsonResource
     {
         $entry = $this->resource;
         $collection = $entry->collection();
-        $actions = Action::for($entry, ['collection' => $collection->handle()]);
 
         return [
             'id' => $entry->id(),

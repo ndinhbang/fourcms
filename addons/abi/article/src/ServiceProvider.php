@@ -4,7 +4,6 @@ namespace Abi\Article;
 
 use Abi\Article\Entries\ArticleEntryQueryBuilder;
 use Abi\Article\Models\Article;
-use DoubleThreeDigital\Runway\Runway;
 use Statamic\Facades\CP\Nav;
 use Statamic\Facades\Permission;
 use Statamic\Providers\AddonServiceProvider;
@@ -46,8 +45,10 @@ class ServiceProvider extends AddonServiceProvider
         $this->mergeConfigFrom(__DIR__ . '/../config/article.php', 'article');
         $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
 
+        $this->registerFieldTypes();
         $this->registerPermissions();
         $this->registerNavigation();
+
 
         if ($this->app->runningInConsole()) {
             // config
@@ -96,6 +97,11 @@ class ServiceProvider extends AddonServiceProvider
 //                    ->setRepository('runway-resources', Routing\ResourceRoutingRepository::class);
 //            }
 //        });
+    }
+
+    protected function registerFieldTypes()
+    {
+        \Abi\Article\Fieldtypes\Articles::register();
     }
 
     protected function registerPermissions()

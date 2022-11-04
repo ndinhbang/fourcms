@@ -30,6 +30,42 @@ sections:
           type: template
           display: Template
           localizable: true
+      -
+        handle: users_field
+        field:
+          mode: default
+          display: 'Users Field'
+          type: users
+          icon: users
+          listable: hidden
+          instructions_position: above
+          visibility: visible
+          always_save: false
+      -
+        handle: entries_field
+        field:
+          mode: default
+          create: true
+          collections:
+            - articles
+          display: 'Entries Field'
+          type: entries
+          icon: entries
+          listable: hidden
+          instructions_position: above
+          visibility: visible
+          always_save: false
+      -
+        handle: articles
+        field:
+          mode: default
+          display: 'Articles Field'
+          type: articles
+          icon: articles
+          listable: hidden
+          instructions_position: above
+          visibility: visible
+          always_save: false
   sidebar:
     display: Sidebar
     fields:
@@ -40,3 +76,14 @@ sections:
           required: true
           validate:
             - required
+      -
+        handle: collections_field
+        field:
+          mode: typeahead
+          display: 'Collections Field'
+          type: collections
+          icon: collections
+          listable: hidden
+          instructions_position: above
+          visibility: visible
+          always_save: false
