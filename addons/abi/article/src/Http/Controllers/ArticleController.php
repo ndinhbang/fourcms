@@ -154,12 +154,14 @@ class ArticleController extends CpController
 
         $entries = $query->paginate(request('perPage'));
 
-        return (new ArticleCollection($entries))
+        $data = (new ArticleCollection($entries))
             ->blueprint($this->collection->entryBlueprint())
             ->columnPreferenceKey("collections.{$this->collection->handle()}.columns")
             ->additional(['meta' => [
                 'activeFilterBadges' => $activeFilterBadges,
             ]]);
+
+        return $data;
     }
 
     protected function indexQuery($collection)

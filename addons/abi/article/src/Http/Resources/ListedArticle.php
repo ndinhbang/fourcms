@@ -3,7 +3,7 @@
 namespace Abi\Article\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
-use Statamic\Facades\Action;
+use Abi\Article\Facades\Action;
 use Statamic\Facades\User;
 
 /**
@@ -32,6 +32,7 @@ class ListedArticle extends JsonResource
     {
         $entry = $this->resource;
         $collection = $entry->collection();
+        $actions = Action::for($entry, ['collection' => $collection->handle()]);
 
         return [
             'id' => $entry->id(),

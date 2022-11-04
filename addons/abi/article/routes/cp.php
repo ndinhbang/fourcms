@@ -1,6 +1,7 @@
 <?php
 
 use Abi\Aricle\Http\Controllers\ArticlePreviewController;
+use Abi\Article\Http\Controllers\ArticleActionController;
 use Abi\Article\Http\Controllers\ArticleController;
 use Abi\Article\Http\Controllers\RestoreArticleRevisionController;
 use Illuminate\Support\Facades\Route;
@@ -46,6 +47,10 @@ use Illuminate\Support\Facades\Route;
 
 Route::name('article.')->prefix('article')->group(function () {
     Route::get('/', [ArticleController::class, 'index'])->name('index');
+
+    Route::post('actions', [ArticleActionController::class, 'run'])->name('actions.run');
+    Route::post('actions/list', [ArticleActionController::class, 'bulkActions'])->name('actions.bulk');
+
     Route::get('/list', [ArticleController::class, 'list'])->name('list');
     Route::get('/create/{site}', [ArticleController::class, 'create'])->name('create');
     Route::post('create/{site}/preview', [ArticlePreviewController::class, 'create'])->name('preview.create');
