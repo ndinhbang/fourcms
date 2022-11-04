@@ -10,7 +10,7 @@
     "type": "project",
     "require": {
         "php": "^8.0",
-        "doctrine/dbal": "^3.4",
+        "abi/article": "dev-develop",
         "doublethreedigital/runway": "^2.5",
         "fruitcake/laravel-cors": "^2.0.5",
         "guzzlehttp/guzzle": "^7.2",
@@ -20,7 +20,7 @@
         "statamic/cms": "3.3.*"
     },
     "require-dev": {
-        "barryvdh/laravel-debugbar": "^3.6",
+        "barryvdh/laravel-debugbar": "^3.7",
         "fakerphp/faker": "^1.9.1",
         "laravel/sail": "^1.13",
         "mockery/mockery": "^1.4.4",
@@ -74,5 +74,11 @@
         "post-update-cmd": [
             "@php artisan vendor:publish --tag=laravel-assets --ansi --force"
         ]
-    }
+    },
+    "repositories": [
+        {
+            "type": "path",
+            "url": "addons/abi/article"
+        }
+    ]
 }

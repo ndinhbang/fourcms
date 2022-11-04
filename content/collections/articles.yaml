@@ -1,5 +1,16 @@
 title: Articles
+template: default
+layout: layout
 revisions: false
+route: 'articles/{id}'
+slugs: false
+date: true
+sort_dir: desc
+default_status: draft
 date_behavior:
   past: public
   future: private
+preview_targets:
+  -
+    label: Article
+    url: '{permalink}'

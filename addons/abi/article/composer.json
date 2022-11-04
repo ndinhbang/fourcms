@@ -1,0 +1,19 @@
+{
+    "name": "abi/article",
+    "autoload": {
+        "psr-4": {
+            "Abi\\Article\\": "src"
+        }
+    },
+    "extra": {
+        "statamic": {
+            "name": "Article",
+            "description": "Article Addon"
+        },
+        "laravel": {
+            "providers": [
+                "Abi\\Article\\ServiceProvider"
+            ]
+        }
+    }
+}
