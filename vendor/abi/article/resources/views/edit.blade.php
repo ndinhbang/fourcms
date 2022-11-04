@@ -4,7 +4,7 @@
 @section('wrapper_class', 'max-w-3xl')
 
 @section('content')
-    <entry-publish-form
+    <article-publish-form
         publish-container="base"
         :initial-actions="{{ json_encode($actions) }}"
         method="patch"
@@ -31,7 +31,7 @@
         :can-edit-blueprint="false"
         :can-manage-publish-state="{{ $str::bool($canManagePublishState) }}"
         create-another-url="{{ cp_route('article.create', [$collection, $locale]) }}"
-        listing-url="{{ cp_route('collections.show', $collection) }}"
+        listing-url="{{ cp_route('article.index') }}"
         :preview-targets="{{ json_encode($previewTargets) }}"
-    ></entry-publish-form>
+    ></article-publish-form>
 @endsection

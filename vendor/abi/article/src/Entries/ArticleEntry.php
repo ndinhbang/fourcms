@@ -41,6 +41,21 @@ class ArticleEntry extends EloquentEntry
         ]);
     }
 
+    public function fresh()
+    {
+        return \Abi\Article\Facades\ArticleEntry::find($this->id);
+    }
+
+    public static function __callStatic($method, $parameters)
+    {
+        return \Abi\Article\Facades\ArticleEntry::{$method}(...$parameters);
+    }
+
+    protected function getOriginByString($origin)
+    {
+        return \Abi\Article\Facades\ArticleEntry::find($origin);
+    }
+
     public function repository()
     {
         return app(ArticleEntryRepository::class);

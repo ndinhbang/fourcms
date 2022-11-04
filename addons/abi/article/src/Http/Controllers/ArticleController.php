@@ -25,6 +25,9 @@ use Statamic\Http\Requests\FilteredRequest;
 use Statamic\Query\Scopes\Filters\Concerns\QueriesFilters;
 use Statamic\Support\Str;
 
+/**
+ * @see \Statamic\Http\Controllers\CP\Collections\EntriesController
+ */
 class ArticleController extends CpController
 {
     use QueriesFilters;
@@ -123,6 +126,9 @@ class ArticleController extends CpController
         ]));
     }
 
+    /**
+     * @see \Statamic\Http\Controllers\CP\Collections\EntriesController::index
+     */
     public function list(FilteredRequest $request)
     {
 //        $this->authorize('view', $collection);
@@ -266,14 +272,14 @@ class ArticleController extends CpController
             ],
             [
                 'text' => $collection->title(),
-                'url' => $collection->showUrl(),
+                'url' => cp_route('article.index'),
             ],
         ]);
     }
 //
 
     /**
-     * @throws ValidationException
+     * @see \Statamic\Http\Controllers\CP\Collections\EntriesController::store
      */
     public function store(Request $request, $site)
     {
@@ -459,6 +465,9 @@ class ArticleController extends CpController
         throw ValidationException::withMessages(['slug' => __('statamic::validation.unique_uri')]);
     }
 
+    /**
+     * @see \Statamic\Http\Controllers\CP\Collections\EntriesController::edit
+     */
     public function edit(Request $request, $id)
     {
         $article = Article::findOrFail($id);
@@ -553,6 +562,112 @@ class ArticleController extends CpController
         ]));
     }
 
+    /**
+     * @see \Statamic\Http\Controllers\CP\Collections\EntriesController::update
+     */
+    public function update(Request $request, $id)
+    {
+//        $this->authorize('update', $entry);
+
+        $article = Article::findOrFail($id);
+
+        /**@var \Abi\Article\Entries\ArticleEntry $entry*/
+        $entry = \Abi\Article\Entries\ArticleEntry::fromModel($article);
+
+        $entry = $entry->fromWorkingCopy();
+
+        /**@var \Statamic\Fields\Blueprint $blueprint*/
+        $blueprint = $entry->blueprint();
+
+        $data = $request->except('id');
+
+//        if (User::current()->cant('edit-other-authors-entries', [EntryContract::class, $collection, $blueprint])) {
+//            $data['author'] = Arr::wrap($entry->value('author'));
+//        }
+
+        $fields = $blueprint
+            ->ensureField('published', ['type' => 'toggle'])
+            ->fields()
+            ->addValues($data);
+
+        $fields
+            ->validator()
+            ->withRules(ArticleEntry::updateRules($this->collection, $entry))
+            ->withReplacements([
+                'id' => $entry->id(),
+                'collection' => $this->collection->handle(),
+                'site' => $entry->locale(),
+            ])->validate();
+
+        $values = $fields->process()->values();
+
+        $parent = $values->pull('parent');
+
+        if ($explicitBlueprint = $values->pull('blueprint')) {
+            $entry->blueprint($explicitBlueprint);
+        }
+
+        $values = $values->except(['slug', 'date', 'published']);
+
+        if ($entry->hasOrigin()) {
+            $entry->data($values->only($request->input('_localized')));
+        } else {
+            $entry->merge($values);
+        }
+
+        if ($entry->collection()->dated()) {
+            $entry->date($this->toCarbonInstanceForSaving($request->date));
+        }
+
+        $entry->slug($this->resolveSlug($request));
+
+        if ($this->collection->structure() && ! $this->collection->orderable()) {
+            $tree = $entry->structure()->in($entry->locale());
+
+            $entry->afterSave(function ($entry) use ($parent, $tree) {
+                if ($parent && optional($tree->page($parent))->isRoot()) {
+                    $parent = null;
+                }
+
+                $tree
+                    ->move($entry->id(), $parent)
+                    ->save();
+            });
+        }
+
+        $this->validateUniqueUri($entry, $tree ?? null, $parent ?? null);
+
+        if ($entry->revisionsEnabled() && $entry->published()) {
+            $entry
+                ->makeWorkingCopy()
+                ->user(User::current())
+                ->save();
+        } else {
+            if (! $entry->revisionsEnabled() && User::current()->can('publish', $entry)) {
+                $entry->published($request->published);
+            }
+
+            $entry->updateLastModified(User::current())->save();
+        }
+
+        return new ArticleResource($entry->fresh());
+    }
+
+    public function destroy($id)
+    {
+        if (! $article = Article::find($id)) {
+            return $this->pageNotFound();
+        }
+
+        /**@var \Abi\Article\Entries\ArticleEntry $entry*/
+        $entry = \Abi\Article\Entries\ArticleEntry::fromModel($article);
+
+//        $this->authorize('delete', $entry);
+
+        $entry->delete();
+
+        return response('', 204);
+    }
 //
 //    public function edit(EditRequest $request, $resourceHandle, $record)
 //    {

@@ -1,5 +1,6 @@
 <?php
 
+use Abi\Aricle\Http\Controllers\ArticlePreviewController;
 use Abi\Article\Http\Controllers\ArticleController;
 use Abi\Article\Http\Controllers\RestoreArticleRevisionController;
 use Illuminate\Support\Facades\Route;
@@ -47,7 +48,7 @@ Route::name('article.')->prefix('article')->group(function () {
     Route::get('/', [ArticleController::class, 'index'])->name('index');
     Route::get('/list', [ArticleController::class, 'list'])->name('list');
     Route::get('/create/{site}', [ArticleController::class, 'create'])->name('create');
-    Route::post('create/{site}/preview', [\Abi\Aricle\Http\Controllers\ArticlePreviewController::class, 'create'])->name('preview.create');
+    Route::post('create/{site}/preview', [ArticlePreviewController::class, 'create'])->name('preview.create');
     Route::post('/{site}', [ArticleController::class, 'store'])->name('store');
 
     Route::get('/{id}', [ArticleController::class, 'edit'])->name('edit');
@@ -55,6 +56,7 @@ Route::name('article.')->prefix('article')->group(function () {
 
     Route::group(['prefix' => '{id}'], function () {
         Route::get('/', [ArticleController::class, 'edit'])->name('edit');
+        Route::patch('/', [ArticleController::class, 'update'])->name('update');
         Route::post('publish', 'PublishedEntriesController@store')->name('published.store');
         Route::post('unpublish', 'PublishedEntriesController@destroy')->name('published.destroy');
 //        Route::post('localize', 'LocalizeEntryController')->name('localize');
@@ -71,8 +73,9 @@ Route::name('article.')->prefix('article')->group(function () {
         Route::post('restore-revision', RestoreArticleRevisionController::class)->name('restore-revision');
         Route::post('preview', 'EntryPreviewController@edit')->name('preview.edit');
         Route::get('preview', 'EntryPreviewController@show')->name('preview.popout');
-        Route::patch('/', 'EntriesController@update')->name('update');
-        Route::get('{slug}', fn ($collection, $entry, $slug) => redirect($entry->editUrl()));
+        Route::get('{slug}', function ($collection, $entry, $slug) {
+            redirect($entry->editUrl());
+        });
     });
 
 //    Route::get('/{record}', [ArticleController::class, 'edit'])->name('edit');

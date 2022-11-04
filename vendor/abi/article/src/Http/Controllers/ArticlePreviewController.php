@@ -8,19 +8,36 @@ use Illuminate\Http\Request;
 use Statamic\Exceptions\CollectionNotFoundException;
 use Statamic\Http\Controllers\CP\PreviewController;
 
+/**
+ * @see \Statamic\Http\Controllers\CP\Collections\EntryPreviewController
+ */
 class ArticlePreviewController extends PreviewController
 {
-    public function create(Request $request, $site)
+    /**
+     * @var \Statamic\Entries\Collection|null
+     */
+    protected $collection;
+
+    /**
+     * @throws \Throwable
+     */
+    public function __construct(Request $request)
     {
+        parent::__construct($request);
+
         $collectionHandle = config('article.collection');
 
         throw_unless(
-            $collection = \Statamic\Facades\Collection::findByHandle($collectionHandle),
+            $this->collection = \Statamic\Facades\Collection::findByHandle($collectionHandle),
             new CollectionNotFoundException($collectionHandle)
         );
+    }
+
+    public function create(Request $request, $site)
+    {
 //        $this->authorize('create', [EntryContract::class, $collection]);
 
-        $fields = $collection->entryBlueprint($request->blueprint)
+        $fields = $this->collection->entryBlueprint($request->blueprint)
             ->fields()
             ->addValues($preview = $request->preview)
             ->process();
@@ -29,11 +46,11 @@ class ArticlePreviewController extends PreviewController
 
         $entry = ArticleEntry::make()
             ->slug($preview['slug'] ?? 'slug')
-            ->collection($collection)
+            ->collection($this->collection)
             ->locale($site->handle())
             ->data($values);
 
-        if ($collection->dated()) {
+        if ($this->collection->dated()) {
             $entry->date($preview['date'] ?? now()->format('Y-m-d-Hi'));
         }
 

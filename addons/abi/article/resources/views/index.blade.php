@@ -9,7 +9,7 @@
     <article-view
         title="{{ $collection->title() }}"
         handle="{{ $collection->handle() }}"
-        breadcrumb-url="{{ cp_route('article.index') }}"
+        breadcrumb-url="{{ cp_route('collections.index') }}"
         :can-create="@can('create', ['Statamic\Contracts\Entries\Entry', $collection]) true @else false @endcan"
         create-url="{{ cp_route('article.create', [$site]) }}"
         create-label="{{ $collection->createLabel() }}"

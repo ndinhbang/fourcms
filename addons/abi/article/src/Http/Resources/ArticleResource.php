@@ -4,6 +4,9 @@ namespace Abi\Article\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/**
+ * @see \Statamic\Http\Resources\CP\Entries\Entry
+ */
 class ArticleResource extends JsonResource
 {
     public function toArray($request)
