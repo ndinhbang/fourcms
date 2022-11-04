@@ -1,6 +1,7 @@
 <?php
 
 use Abi\Article\Http\Controllers\ArticleController;
+use Abi\Article\Http\Controllers\RestoreArticleRevisionController;
 use Illuminate\Support\Facades\Route;
 
 //Route::group(['namespace' => 'Collections'], function () {
@@ -51,6 +52,28 @@ Route::name('article.')->prefix('article')->group(function () {
 
     Route::get('/{id}', [ArticleController::class, 'edit'])->name('edit');
     Route::patch('/{id}', [ArticleController::class, 'update'])->name('update');
+
+    Route::group(['prefix' => '{id}'], function () {
+        Route::get('/', [ArticleController::class, 'edit'])->name('edit');
+        Route::post('publish', 'PublishedEntriesController@store')->name('published.store');
+        Route::post('unpublish', 'PublishedEntriesController@destroy')->name('published.destroy');
+//        Route::post('localize', 'LocalizeEntryController')->name('localize');
+
+        Route::get('revisions', 'EntryRevisionsController@index')->name('revisions.index');
+        Route::post('revisions', 'EntryPreviewController@store')->name('revisions.store');
+        Route::get('revisions/{revisions}', 'EntryPreviewController@show')->name('revisions.show');
+
+//        Route::resource('revisions', 'EntryRevisionsController', [
+//            'as' => 'collections.entries',
+//            'only' => ['index', 'store', 'show'],
+//        ]);
+
+        Route::post('restore-revision', RestoreArticleRevisionController::class)->name('restore-revision');
+        Route::post('preview', 'EntryPreviewController@edit')->name('preview.edit');
+        Route::get('preview', 'EntryPreviewController@show')->name('preview.popout');
+        Route::patch('/', 'EntriesController@update')->name('update');
+        Route::get('{slug}', fn ($collection, $entry, $slug) => redirect($entry->editUrl()));
+    });
 
 //    Route::get('/{record}', [ArticleController::class, 'edit'])->name('edit');
 //    Route::patch('/{record}', [ArticleController::class, 'update'])->name('update');

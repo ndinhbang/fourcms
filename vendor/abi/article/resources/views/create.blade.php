@@ -21,5 +21,4 @@
         :can-manage-publish-state="{{ Statamic\Support\Str::bool($canManagePublishState) }}"
         :preview-targets="{{ json_encode($previewTargets) }}"
     ></article-create-form>
-
 @endsection

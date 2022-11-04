@@ -5,6 +5,7 @@ namespace App\Entries\Base;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 use Statamic\Entries\Entry as FileEntry;
+use Statamic\Facades\Blink;
 
 abstract class EloquentEntry extends FileEntry
 {
@@ -173,4 +174,5 @@ abstract class EloquentEntry extends FileEntry
             ->slug($this->slug())
             ->date($this->date());
     }
+
 }

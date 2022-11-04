@@ -81,6 +81,13 @@ class ArticleEntry extends EloquentEntry
         return $this->cpUrl('article.restore-revision');
     }
 
+    public function livePreviewUrl()
+    {
+        return $this->collection()->route($this->locale())
+            ? $this->cpUrl('article.preview.edit')
+            : null;
+    }
+
     public function apiUrl()
     {
         if (! $id = $this->id()) {

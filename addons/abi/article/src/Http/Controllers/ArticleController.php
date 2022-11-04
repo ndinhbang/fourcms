@@ -6,6 +6,7 @@ use Abi\Article\Facades\ArticleEntry;
 use Abi\Article\Http\Requests\IndexRequest;
 use Abi\Article\Http\Resources\ArticleCollection;
 use Abi\Article\Http\Resources\ArticleResource;
+use Abi\Article\Models\Article;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Validation\ValidationException;
@@ -15,6 +16,7 @@ use Statamic\CP\Breadcrumbs;
 use Statamic\Exceptions\BlueprintNotFoundException;
 use Statamic\Exceptions\CollectionNotFoundException;
 use Statamic\Exceptions\SiteNotFoundException;
+use Statamic\Facades\Asset;
 use Statamic\Facades\Scope;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
@@ -383,6 +385,61 @@ class ArticleController extends CpController
             ->build($entry->route());
     }
 
+    protected function extractFromFields($entry, $blueprint)
+    {
+        // The values should only be data merged with the origin data.
+        // We don't want injected collection values, which $entry->values() would have given us.
+        $target = $entry;
+        $values = $target->data();
+        while ($target->hasOrigin()) {
+            $target = $target->origin();
+            $values = $target->data()->merge($values);
+        }
+        $values = $values->all();
+
+        if ($entry->hasStructure()) {
+            $values['parent'] = array_filter([optional($entry->parent())->id()]);
+        }
+
+        if ($entry->collection()->dated()) {
+            $datetime = substr($entry->date()->toDateTimeString(), 0, 16);
+            $datetime = ($entry->hasTime()) ? $datetime : substr($datetime, 0, 10);
+            $values['date'] = $datetime;
+        }
+
+        $fields = $blueprint
+            ->fields()
+            ->addValues($values)
+            ->preProcess();
+
+        $values = $fields->values()->merge([
+            'title' => $entry->value('title'),
+            'slug' => $entry->slug(),
+            'published' => $entry->published(),
+        ]);
+
+        return [$values->all(), $fields->meta()];
+    }
+
+    protected function extractAssetsFromValues($values)
+    {
+        return collect($values)
+            ->filter(function ($value) {
+                return is_string($value);
+            })
+            ->map(function ($value) {
+                preg_match_all('/"asset::([^"]+)"/', $value, $matches);
+
+                return str_replace('\/', '/', $matches[1]) ?? null;
+            })
+            ->flatten(2)
+            ->unique()
+            ->map(function ($id) {
+                return Asset::find($id);
+            })
+            ->filter()
+            ->values();
+    }
 
     /**
      * @throws ValidationException
@@ -402,23 +459,29 @@ class ArticleController extends CpController
         throw ValidationException::withMessages(['slug' => __('statamic::validation.unique_uri')]);
     }
 
-    public function edit(Request $request, $collection, $entry)
+    public function edit(Request $request, $id)
     {
+        $article = Article::findOrFail($id);
+
+        /**@var \Abi\Article\Entries\ArticleEntry $entry*/
+        $entry = \Abi\Article\Entries\ArticleEntry::fromModel($article);
+
 //        $this->authorize('view', $entry);
 
         $entry = $entry->fromWorkingCopy();
 
+        /**@var \Statamic\Fields\Blueprint $blueprint*/
         $blueprint = $entry->blueprint();
 
         if (! $blueprint) {
-            throw new BlueprintNotFoundException($entry->value('blueprint'), 'collections/'.$collection->handle());
+            throw new BlueprintNotFoundException($entry->value('blueprint'), 'collections/'.$this->collection->handle());
         }
 
         $blueprint->setParent($entry);
 
-        if (User::current()->cant('edit-other-authors-entries', [EntryContract::class, $collection, $blueprint])) {
-            $blueprint->ensureFieldHasConfig('author', ['visibility' => 'read_only']);
-        }
+//        if (User::current()->cant('edit-other-authors-entries', [EntryContract::class, $collection, $blueprint])) {
+//            $blueprint->ensureFieldHasConfig('author', ['visibility' => 'read_only']);
+//        }
 
         [$values, $meta] = $this->extractFromFields($entry, $blueprint);
 
@@ -437,12 +500,12 @@ class ArticleController extends CpController
                 'revisions' => $entry->revisionsUrl(),
                 'restore' => $entry->restoreRevisionUrl(),
                 'createRevision' => $entry->createRevisionUrl(),
-                'editBlueprint' => cp_route('collections.blueprints.edit', [$collection, $blueprint]),
+                'editBlueprint' => cp_route('collections.blueprints.edit', [$this->collection, $blueprint]),
             ],
             'values' => array_merge($values, ['id' => $entry->id()]),
             'meta' => $meta,
-            'collection' => $collection->handle(),
-            'collectionHasRoutes' => ! is_null($collection->route($entry->locale())),
+            'collection' => $this->collection->handle(),
+            'collectionHasRoutes' => ! is_null($this->collection->route($entry->locale())),
             'blueprint' => $blueprint->toPublishArray(),
             'readOnly' => User::current()->cant('edit', $entry),
             'locale' => $entry->locale(),
@@ -452,7 +515,7 @@ class ArticleController extends CpController
             'originValues' => $originValues ?? null,
             'originMeta' => $originMeta ?? null,
             'permalink' => $entry->absoluteUrl(),
-            'localizations' => $collection->sites()->map(function ($handle) use ($entry) {
+            'localizations' => $this->collection->sites()->map(function ($handle) use ($entry) {
                 $localized = $entry->in($handle);
                 $exists = $localized !== null;
 
@@ -472,9 +535,9 @@ class ArticleController extends CpController
             'hasWorkingCopy' => $entry->hasWorkingCopy(),
             'preloadedAssets' => $this->extractAssetsFromValues($values),
             'revisionsEnabled' => $entry->revisionsEnabled(),
-            'breadcrumbs' => $this->breadcrumbs($collection),
+            'breadcrumbs' => $this->breadcrumbs($this->collection),
             'canManagePublishState' => User::current()->can('publish', $entry),
-            'previewTargets' => $collection->previewTargets()->all(),
+            'previewTargets' => $this->collection->previewTargets()->all(),
         ];
 
         if ($request->wantsJson()) {
@@ -485,7 +548,7 @@ class ArticleController extends CpController
             session()->now('success', __('Entry created'));
         }
 
-        return view('statamic::entries.edit', array_merge($viewData, [
+        return view('article::edit', array_merge($viewData, [
             'entry' => $entry,
         ]));
     }
