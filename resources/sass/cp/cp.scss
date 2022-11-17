@@ -1,0 +1,112 @@
+@tailwind base;
+
+@tailwind components;
+
+// Base things
+@import "cp/core/normalize";
+@import "cp/core/fonts";
+@import "cp/core/mixins";
+@import "cp/core/variables";
+@import "cp/core/animation";
+
+// Vendor things
+@import "vendors/codemirror";
+@import "vendors/date-picker";
+@import "vendors/luminous";
+@import "vendors/sweetalert";
+@import "vendors/tippy";
+@import "vendors/vue-select";
+
+
+// Core things that need to override vendor things
+@import "cp/core/layout";
+@import "cp/core/typography";
+
+// Elements
+@import "cp/elements/buttons";
+@import "cp/elements/badges";
+@import "cp/elements/dropdowns";
+@import "cp/elements/forms";
+@import "cp/elements/icons";
+@import "cp/elements/tables";
+
+// Components
+@import "cp/components/alerts";
+@import "cp/components/array";
+@import "cp/components/assets";
+@import "cp/components/blueprints";
+@import "cp/components/breadcrumbs";
+@import "cp/components/cards";
+@import "cp/components/column-picker";
+@import "cp/components/configure";
+@import "cp/components/dashboard";
+@import "cp/components/filters";
+@import "cp/components/focal-point";
+@import "cp/components/global-header";
+@import "cp/components/items";
+@import "cp/components/login";
+@import "cp/components/metrics";
+@import "cp/components/modal";
+@import "cp/components/nav-main";
+@import "cp/components/nav-mobile";
+@import "cp/components/notifications";
+@import "cp/components/page-tree";
+@import "cp/components/pagination";
+@import "cp/components/popover";
+@import "cp/components/preview";
+@import "cp/components/publish";
+@import "cp/components/progress";
+@import "cp/components/revisions";
+@import "cp/components/roles";
+@import "cp/components/shortcuts";
+@import "cp/components/sortable";
+@import "cp/components/stacks";
+@import "cp/components/tabs";
+@import "cp/components/toggle";
+@import "cp/components/tooltips";
+@import "cp/components/updater";
+@import "cp/components/wizard";
+
+// Fieldtypes
+@import "cp/components/fieldtypes/array";
+@import "cp/components/fieldtypes/assets";
+@import "cp/components/fieldtypes/bard";
+@import "cp/components/fieldtypes/button-group";
+@import "cp/components/fieldtypes/checkboxes";
+@import "cp/components/fieldtypes/code";
+@import "cp/components/fieldtypes/color";
+@import "cp/components/fieldtypes/datetime";
+@import "cp/components/fieldtypes/environment";
+@import "cp/components/fieldtypes/grid";
+@import "cp/components/fieldtypes/hidden";
+@import "cp/components/fieldtypes/list";
+@import "cp/components/fieldtypes/markdown";
+@import "cp/components/fieldtypes/partial";
+@import "cp/components/fieldtypes/relationship";
+@import "cp/components/fieldtypes/replicator";
+@import "cp/components/fieldtypes/section";
+@import "cp/components/fieldtypes/table";
+@import "cp/components/fieldtypes/tags";
+@import "cp/components/fieldtypes/textarea";
+@import "cp/components/fieldtypes/time";
+@import "cp/components/fieldtypes/video";
+@import "cp/components/fieldtypes/yaml";
+
+@tailwind utilities;
+
+@import "cp/core/utilities";
+
+
+#statamic {
+    transition: all 0.3s ease;
+    min-height: 100vh;
+}
+
+.pane-slide-enter-active,
+.pane-slide-leave-active {
+    transition: all 0.3s ease;
+}
+.pane-slide-enter,
+.pane-slide-leave-to {
+    transform: translateX(24rem);
+}

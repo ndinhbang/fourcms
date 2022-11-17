@@ -1,41 +1,63 @@
 const mix = require('laravel-mix');
+const webpack = require('webpack');
+const tailwindcss = require('tailwindcss');
+const src = 'resources';
+const dest = 'resources/dist';
 
-/*
- |--------------------------------------------------------------------------
- | Mix Asset Management
- |--------------------------------------------------------------------------
- |
- | Mix provides a clean, fluent API for defining some Webpack build steps
- | for your Laravel applications. By default, we are compiling the CSS
- | file for the application as well as bundling up all the JS files.
- |
- */
+mix.setPublicPath('./resources/dist');
 
-mix.js('resources/js/site.js', 'public/js')
+mix.sass(`${src}/sass/cp.scss`, `${dest}/css`).options({
+    processCssUrls: false,
+    postCss: [
+        tailwindcss('./tailwind.config.js'),
+        require('autoprefixer')
+    ],
+});
 
-mix.postCss('resources/css/tailwind.css', 'public/css', [
-    require('postcss-import'),
-    require('tailwindcss/nesting'),
-    require('tailwindcss'),
-])
+mix.js(`${src}/js/app.js`, `${dest}/js`);
+mix.extract([
+    '@popperjs/core',
+    '@shopify/draggable',
+    'alpinejs',
+    'autosize',
+    'axios',
+    'codemirror',
+    'cookies-js',
+    'dmuploader',
+    'jquery-ui',
+    'jquery',
+    'luminous-lightbox',
+    'marked-plaintext',
+    'marked',
+    'moment',
+    'mousetrap',
+    'speakingurl',
+    'sweetalert',
+    'underscore',
+    'v-calendar',
+    'vue-clickaway',
+    'vue-js-modal',
+    'vue-js-popover',
+    'vue'
+]);
 
-if (mix.inProduction()) {
-   mix.version();
-}
+mix.copyDirectory(`${src}/img`, `${dest}/img`);
+mix.copyDirectory(`${src}/svg`, `${dest}/svg`);
+mix.copyDirectory(`${src}/audio`, `${dest}/audio`);
+mix.copyDirectory(`${src}/fonts`, `${dest}/fonts`);
 
-/*
- |--------------------------------------------------------------------------
- | Statamic Control Panel
- |--------------------------------------------------------------------------
- |
- | Feel free to add your own JS or CSS to the Statamic Control Panel.
- | https://statamic.dev/extending/control-panel#adding-css-and-js-assets
- |
- */
+mix.sourceMaps();
 
-// mix.js('resources/js/cp.js', 'public/vendor/app/js')
-//    .postCss('resources/css/cp.css', 'public/vendor/app/css', [
-//     require('postcss-import'),
-//     require('tailwindcss/nesting'),
-//     require('tailwindcss'),
-// ])
+mix.options({ extractVueStyles: true });
+
+mix.webpackConfig({
+    devtool: 'source-map',
+    plugins: [
+        // Some vendor files reference globals
+        new webpack.ProvidePlugin({ $: "jquery", jQuery: "jquery" }),
+
+        // Our files reference globals too
+        new webpack.ProvidePlugin({ Vue: "vue" }),
+        new webpack.ProvidePlugin({ Alpine: "Alpine" })
+    ]
+})
