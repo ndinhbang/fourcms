@@ -17,6 +17,7 @@ use Composer\Util\Filesystem;
 use Composer\Util\Platform;
 use Composer\Util\Silencer;
 use LogicException;
+use RuntimeException;
 use Seld\Signal\SignalHandler;
 use Symfony\Component\Console\Application as BaseApplication;
 use Symfony\Component\Console\Exception\CommandNotFoundException;
@@ -235,6 +236,9 @@ class Application extends BaseApplication
                 false === $commandName
                 // list command requires plugin commands to show them
                 || in_array($commandName, ['', 'list', 'help'], true)
+                // autocompletion requires plugin commands but if we are running as root without COMPOSER_ALLOW_SUPERUSER
+                // we'd rather not autocomplete plugins than abort autocompletion entirely, so we avoid loading plugins in this case
+                || ($commandName === '_complete' && !$isNonAllowedRoot)
             );
 
         if ($mayNeedPluginCommand && !$this->disablePluginsByDefault && !$this->hasPluginCommands) {
@@ -283,6 +287,7 @@ class Application extends BaseApplication
         }
 
         if ($isNonAllowedRoot && !$io->isInteractive()) {
+            $io->writeError('<error>Composer plugins have been disabled for safety in this non-interactive session. Set COMPOSER_ALLOW_SUPERUSER=1 if you want to allow plugins to run as root/super user.</error>');
             $this->disablePluginsByDefault = true;
         }
 
@@ -505,6 +510,10 @@ class Application extends BaseApplication
                     throw $e;
                 }
             } catch (JsonValidationException $e) {
+                if ($required) {
+                    throw $e;
+                }
+            } catch (RuntimeException $e) {
                 if ($required) {
                     throw $e;
                 }
