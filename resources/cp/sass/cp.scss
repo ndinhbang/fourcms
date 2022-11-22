@@ -1,6 +1,6 @@
-@import "tailwindcss/base";
+@tailwind base;
 
-@import "tailwindcss/components";
+@tailwind components;
 
 // Base things
 @import "core/normalize";
@@ -92,7 +92,7 @@
 @import "components/fieldtypes/video";
 @import "components/fieldtypes/yaml";
 
-@import "tailwindcss/utilities";
+@tailwind utilities;
 
 @import "core/utilities";
 

@@ -123,10 +123,11 @@ import Superscript from './Superscript';
 import RemoveFormat from './RemoveFormat';
 import LinkToolbarButton from './LinkToolbarButton.vue';
 import ManagesSetMeta from '../replicator/ManagesSetMeta';
-import { availableButtons, addButtonHtml } from './buttons';
+import { availableButtons, addButtonHtml } from '../bard/buttons';
 import readTimeEstimate from 'read-time-estimate';
 import javascript from 'highlight.js/lib/languages/javascript'
 import css from 'highlight.js/lib/languages/css'
+import hljs from 'highlight.js/lib/highlight';
 import 'highlight.js/styles/github.css';
 import mark from './Mark';
 import node from './Node';

@@ -1,6 +1,4 @@
 <script>
-import { cp_url, utf8btoa } from "../../bootstrap/globals";
-
 export default {
 
     props: {

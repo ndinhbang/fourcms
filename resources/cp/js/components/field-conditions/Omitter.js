@@ -1,4 +1,4 @@
-import { clone } from '../../bootstrap/globals.js'
+import { clone } from  '../../bootstrap/globals.js'
 
 export default class {
     constructor(values, jsonFields) {

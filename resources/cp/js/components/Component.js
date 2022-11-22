@@ -1,5 +1,3 @@
-import Vue from 'vue';
-
 class Component {
 
     constructor(id, name, props) {

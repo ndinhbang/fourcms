@@ -1,6 +1,5 @@
 import uniqid from 'uniqid';
 import Component from './Component';
-import Vue from 'vue';
 
 class Components {
 

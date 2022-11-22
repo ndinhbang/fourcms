@@ -11,7 +11,7 @@
     height: 48px;
 
     .tab-button {
-        @apply whitespace-nowrap bg-grey-10 py-sm px-2 flex-shrink-0 leading-tight text-xs w-auto relative flex items-center justify-center rounded-t-md shadow border-b border-grey-30 select-none;
+        @apply whitespace-no-wrap bg-grey-10 py-sm px-2 flex-shrink-0 leading-tight text-xs w-auto relative flex items-center justify-center rounded-t-md shadow border-b border-grey-30 select-none;
         height: 94%;
         min-height: 94%;
     }
@@ -53,5 +53,5 @@
   ========================================================================== */
 
 @screen md {
-    .tabs .tab-button { @apply text-base; }
+    .tabs .tab-button { @apply .text-base; }
 }

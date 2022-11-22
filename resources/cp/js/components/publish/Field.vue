@@ -123,7 +123,7 @@ export default {
         },
 
         fieldtypeComponentExists() {
-            return window.Vue.options.components[this.fieldtypeComponent] !== undefined;
+            return Vue.options.components[this.fieldtypeComponent] !== undefined;
         },
 
         instructions() {
@@ -199,7 +199,7 @@ export default {
         labelText() {
             if (this.showHandle) return this.config.handle
             return this.config.display
-                || window.Vue.$options.filters.titleize(window.Vue.$options.filters.deslugify(this.config.handle));
+                || Vue.$options.filters.titleize(Vue.$options.filters.deslugify(this.config.handle));
         }
 
     },

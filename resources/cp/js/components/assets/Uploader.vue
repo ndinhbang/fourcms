@@ -1,6 +1,8 @@
 <script>
 require('dmuploader')
 
+// import '../../vendor/dmuploader'
+
 export default {
 
     render(h) {

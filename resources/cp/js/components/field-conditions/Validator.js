@@ -1,6 +1,6 @@
 import Converter from './Converter.js';
 import { KEYS } from './Constants.js';
-import { data_get } from '../../bootstrap/globals.js'
+import { data_get } from  '../../bootstrap/globals.js'
 import isString from 'underscore/modules/isString.js'
 import isObject from 'underscore/modules/isObject.js'
 import isEmpty from 'underscore/modules/isEmpty.js'

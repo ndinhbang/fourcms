@@ -1,4 +1,3 @@
-import _ from 'underscore';
 _.mixin({
     // ### _.objMap
     // _.map for objects, keeps key/value associations
@@ -32,5 +31,3 @@ _.mixin({
              }, {}, context);
     }
 });
-
-window._ = _;

@@ -3,35 +3,32 @@ import Toast from './mixins/Toast.js';
 import Statamic from './components/Statamic.js';
 import Alpine from 'alpinejs'
 import * as Globals from './bootstrap/globals'
-
-import Cookies from 'cookies-js'
+import { default as underscore } from 'underscore'
 
 let global_functions = Object.keys(Globals)
 global_functions.forEach(fnName => { global[fnName] = Globals[fnName] })
-global.Cookies = Cookies;
+global.Cookies = require('cookies-js');
 
 Vue.config.silent = false;
 Vue.config.devtools = true;
 Vue.config.productionTip = false
 
-import rangy from 'rangy'
-import jQuery from "jquery";
-
 window.Alpine = Alpine
 window.Vue = Vue;
 window.Statamic = Statamic;
-window.$ = window.jQuery = jQuery;
-window.rangy = rangy;
+window._ = underscore;
+window.$ = window.jQuery = require('jquery');
+window.rangy = require('rangy');
 
-import './bootstrap/polyfills'
-import './bootstrap/underscore-mixins';
-import './bootstrap/jquery-plugins';
-import './bootstrap/plugins';
-import './bootstrap/filters';
-import './bootstrap/mixins';
-import './bootstrap/components';
-import './bootstrap/fieldtypes';
-import './bootstrap/directives';
+require('./bootstrap/polyfills');
+require('./bootstrap/underscore-mixins');
+require('./bootstrap/jquery-plugins');
+require('./bootstrap/plugins');
+require('./bootstrap/filters');
+require('./bootstrap/mixins');
+require('./bootstrap/components');
+require('./bootstrap/fieldtypes');
+require('./bootstrap/directives');
 
 import axios from 'axios';
 import PortalVue from "portal-vue";
@@ -43,7 +40,6 @@ import VTooltip from 'v-tooltip'
 import ReactiveProvide from 'vue-reactive-provide';
 import vSelect from 'vue-select'
 import VCalendar from 'v-calendar';
-import moment from 'moment'
 
 // Customize vSelect UI components
 vSelect.props.components.default = () => ({
@@ -73,7 +69,7 @@ Vue.prototype.$echo = Statamic.$echo;
 Vue.prototype.$bard = Statamic.$bard;
 Vue.prototype.$keys = Statamic.$keys;
 
-window.moment = Vue.moment = Vue.prototype.$moment = moment;
+window.moment = Vue.moment = Vue.prototype.$moment = require('moment');
 
 Vue.use(Popover, { tooltip: true })
 Vue.use(PortalVue)

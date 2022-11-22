@@ -10,19 +10,12 @@ $mouse: #C3CACD;
 $rem-base: 16px;
 
 // Functions
-/// Remove the unit of a length
-/// @param {Number} $number - Number to remove unit from
-/// @return {Number} - Unitless number
-@function strip-unit($number) {
-    @if type-of($number) == 'number' and not unitless($number) {
-        @return calc($number / ($number * 0 + 1px));
-    }
-
-    @return $number;
+@function strip-unit($num) {
+  @return $num / ($num * 0 + 1);
 }
 
 @function convert-to-rem($value, $base-value: $rem-base)  {
-  $value: calc(strip-unit($value) / strip-unit($base-value)) * 1rem;
+  $value: strip-unit($value) / strip-unit($base-value) * 1rem;
   @if ($value == 0rem) { $value: 0; } // Turn 0rem into 0
   @return $value;
 }
@@ -116,7 +109,7 @@ $rem-base: 16px;
         position: absolute;
 
         .dr-calendar {
-            @apply shadow bg-white rounded-b relative overflow-hidden text-sm;
+            @apply .shadow bg-white rounded-b relative overflow-hidden text-sm;
             z-index: 4;
             padding-top: 5px;
             top: 2px;
