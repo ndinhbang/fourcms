@@ -45,7 +45,7 @@ export default {
             if (values && this.hasFields(values)) {
                 Vue.set(this.activeFilters, handle, values);
             } else {
-                Vue.delete(this.activeFilters, handle);
+                window.Vue.delete(this.activeFilters, handle);
             }
             if (unselectAll) this.unselectAllItems();
         },

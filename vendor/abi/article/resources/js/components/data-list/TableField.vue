@@ -24,7 +24,7 @@ export default {
 
             if (!this.fieldtype) return fallback;
 
-            return window.Vue.$options.components[custom] ? custom : fallback;
+            return window.Vue.options.components[custom] ? custom : fallback;
         }
 
     }

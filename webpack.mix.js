@@ -14,7 +14,7 @@ mix.sass(`${src}/sass/cp.scss`, `${dest}/css`).options({
     ],
 });
 
-mix.js(`${src}/js/app.js`, `${dest}/js`);
+mix.js(`${src}/js/app.js`, `${dest}/js`).vue({ extractVueStyles: true, version: 2 });
 mix.extract([
     '@popperjs/core',
     '@shopify/draggable',
@@ -48,9 +48,13 @@ mix.copyDirectory(`${src}/fonts`, `${dest}/fonts`);
 
 mix.sourceMaps();
 
-mix.vue({ extractVueStyles: true, version: 2 });
-
 mix.webpackConfig({
+    resolve: {
+        alias: {
+            'vue$': 'vue/dist/vue.common.js'
+
+        }
+    },
     devtool: 'source-map',
     plugins: [
         // Some vendor files reference globals

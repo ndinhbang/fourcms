@@ -123,7 +123,7 @@ export default {
         },
 
         fieldtypeComponentExists() {
-            return window.Vue.$options.components[this.fieldtypeComponent] !== undefined;
+            return window.Vue.options.components[this.fieldtypeComponent] !== undefined;
         },
 
         instructions() {
