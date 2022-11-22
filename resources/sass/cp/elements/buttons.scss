@@ -9,7 +9,7 @@ button {
 // Base button styles that shouldn't need overriding
 [class^="btn"], [class*=" btn"] {
     @apply cursor-pointer select-none h-auto rounded relative;
-    @apply leading-normal inline-block align-middle whitespace-no-wrap;
+    @apply leading-normal inline-block align-middle whitespace-nowrap;
     @apply text-center text-sm subpixel-antialiased;
 
     height: 2.375rem; // 38px
@@ -210,7 +210,7 @@ td .btn-icon {
 }
 
 .btn-with-icon {
-    @apply .flex .items-center;
+    @apply flex items-center;
 
     svg {
         margin: 0 8px 0 -4px;
@@ -221,7 +221,7 @@ td .btn-icon {
 }
 
 .btn-icon-only {
-    @apply .flex .items-center;
+    @apply flex items-center;
 
     padding: 0 12px;
     svg {

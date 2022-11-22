@@ -1,5 +1,5 @@
 .bard-fieldtype-wrapper {
-    @apply .border .rounded relative outline-none;
+    @apply border rounded relative outline-none;
 
     * { outline: none; }
 
@@ -17,7 +17,7 @@
 }
 
 .bard-editor .bard-invalid {
-    @apply p-1 bg-red-lighter text-red text-xs whitespace-no-wrap;
+    @apply p-1 bg-red-lighter text-red text-xs whitespace-nowrap;
 }
 
 // Modes
@@ -36,7 +36,7 @@
 }
 
 .bard-fixed-toolbar {
-    @apply .bg-white .shadow-none rounded-t .border-b .text-sm flex items-start justify-between;
+    @apply bg-white shadow-none rounded-t border-b text-sm flex items-start justify-between;
     position: sticky;
     padding: 4px 8px;
     z-index: 5;
@@ -65,9 +65,9 @@
     }
 
     .bard-toolbar-button:disabled {
-        @apply .opacity-50;
+        @apply opacity-50;
         &:hover {
-            @apply .text-grey-80;
+            @apply text-grey-80;
         }
     }
 
@@ -149,11 +149,11 @@
     }
 
     .bard-toolbar-button:hover {
-        @apply .text-white;
+        @apply text-white;
     }
 
     .bard-toolbar-button.active {
-        @apply .text-blue;
+        @apply text-blue;
     }
 
     .bard-toolbar-button:focus {
@@ -161,9 +161,9 @@
     }
 
     .bard-toolbar-button:disabled {
-        @apply .opacity-50;
+        @apply opacity-50;
         &:hover {
-            @apply .text-grey-20;
+            @apply text-grey-20;
         }
     }
 
@@ -173,7 +173,7 @@
 }
 
 .bard-footer-toolbar {
-    @apply .bg-white .shadow-none text-grey-70 rounded-b .border-t .text-xs .p-1 flex items-center justify-between;
+    @apply bg-white shadow-none text-grey-70 rounded-b border-t text-xs p-1 flex items-center justify-between;
     padding: 8px 12px;
 
     .bard-fullscreen & {
@@ -232,15 +232,15 @@
     }
 
     .ProseMirror {
-        @apply .px-3 py-6 flex flex-col;
+        @apply px-3 py-6 flex flex-col;
         min-height: calc(100vh - 120px);
 
         > p > code, > pre code {
             @apply bg-grey-30;
         }
-        
+
         // To remove min height from nested bard fields inside bard in fullscreen mode.
-        * > .ProseMirror { 
+        * > .ProseMirror {
             min-height: auto;
         }
     }
@@ -369,13 +369,13 @@
         margin-top: 0;
     }
 
-    ul, 
+    ul,
     blockquote ul,
     .tableWrapper table ul {
         list-style-type: disc;
     }
 
-    ol, 
+    ol,
     blockquote ol,
     .tableWrapper table ol {
         list-style-type: decimal;
