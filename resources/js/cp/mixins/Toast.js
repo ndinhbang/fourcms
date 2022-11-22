@@ -1,6 +1,7 @@
 import Toasted from 'vue-toasted';
+// import Vue from 'vue';
 
-Vue.use(Toasted, {
+window.Vue.use(Toasted, {
     position: 'bottom-left',
     duration: 3500,
     theme: 'statamic',

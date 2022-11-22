@@ -74,8 +74,8 @@
 <script>
 import uniqid from 'uniqid';
 import HasInputOptions from '../fieldtypes/HasInputOptions.js';
-import Converter from '../field-conditions/Converter.js';
-import { KEYS, OPERATORS } from '../field-conditions/Constants.js';
+import Converter from './Converter.js';
+import { KEYS, OPERATORS } from './Constants.js';
 
 export default {
 

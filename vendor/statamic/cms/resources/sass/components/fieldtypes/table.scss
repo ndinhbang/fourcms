@@ -53,7 +53,7 @@
             @apply w-3 border-r h-full p-1;
             cursor: grab;
             background: theme('colors.grey-20') url('../svg/drag-dots.svg') center center no-repeat;
-            &:hover { @apply .bg-grey-30; }
+            &:hover { @apply bg-grey-30; }
         }
     }
 

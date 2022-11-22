@@ -1,10 +1,10 @@
 const mix = require('laravel-mix');
 const webpack = require('webpack');
 const tailwindcss = require('tailwindcss');
-const src = 'resources';
-const dest = 'resources/dist';
+const src = 'resources/cp';
+const dest = 'public/vendor/statamic/cp';
 
-mix.setPublicPath('./resources/dist');
+mix.setPublicPath('./public/vendor/statamic/cp');
 
 mix.sass(`${src}/sass/cp.scss`, `${dest}/css`).options({
     processCssUrls: false,
@@ -48,7 +48,7 @@ mix.copyDirectory(`${src}/fonts`, `${dest}/fonts`);
 
 mix.sourceMaps();
 
-mix.options({ extractVueStyles: true });
+mix.vue({ extractVueStyles: true, version: 2 });
 
 mix.webpackConfig({
     devtool: 'source-map',

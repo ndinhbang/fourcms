@@ -3,6 +3,7 @@ import HasActions from './data-list/HasActions';
 import HasFilters from './data-list/HasFilters';
 import HasPagination from './data-list/HasPagination';
 import HasPreferences from './data-list/HasPreferences';
+import { utf8btoa } from "../bootstrap/globals";
 
 export default {
 

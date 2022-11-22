@@ -39,7 +39,7 @@
 
 <script>
 import Fuse from 'fuse.js';
-import ProvidesFieldtypes from '../fields/ProvidesFieldtypes';
+import ProvidesFieldtypes from './ProvidesFieldtypes';
 
 export default {
 

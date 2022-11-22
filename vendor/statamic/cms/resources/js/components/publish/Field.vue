@@ -199,7 +199,7 @@ export default {
         labelText() {
             if (this.showHandle) return this.config.handle
             return this.config.display
-                || Vue.$options.filters.titleize(Vue.$options.filters.deslugify(this.config.handle));
+                || window.Vue.$options.filters.titleize(Vue.$options.filters.deslugify(this.config.handle));
         }
 
     },
