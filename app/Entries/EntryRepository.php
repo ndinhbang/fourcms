@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Repositories\Base;
+namespace App\Entries;
 
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Entries\EntryRepository as RepositoryContract;
@@ -13,7 +13,7 @@ use Statamic\Support\Arr;
  * @see https://statamic.dev/tips/storing-entries-in-a-database#saving-and-deleting
  * @see vendor/statamic/cms/src/Stache/Repositories/EntryRepository.php
  */
-abstract class EloquentEntryRepository implements RepositoryContract
+abstract class EntryRepository implements RepositoryContract
 {
     protected $stache;
 
@@ -21,6 +21,7 @@ abstract class EloquentEntryRepository implements RepositoryContract
     protected $substitutionsByUri = [];
 
     abstract public function query(): QueryBuilder;
+
     abstract public function make(): Entry;
 
     public function __construct(Stache $stache)
