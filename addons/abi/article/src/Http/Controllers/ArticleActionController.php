@@ -3,7 +3,7 @@
 namespace Abi\Article\Http\Controllers;
 
 use Abi\Article\Facades\Action;
-use Abi\Article\Facades\ArticleEntry;
+use Abi\Article\Facades\Article;
 use Illuminate\Http\Request;
 use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\ActionController;
@@ -75,7 +75,7 @@ class ArticleActionController extends ActionController
     protected function getSelectedItems($items, $context)
     {
         return $items->map(function ($item) {
-            return ArticleEntry::find($item);
+            return Article::find($item);
         });
     }
 }

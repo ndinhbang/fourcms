@@ -2,7 +2,7 @@
 
 namespace Abi\Article\Facades;
 
-use Abi\Article\Repositories\ArticleEntryRepository;
+use Abi\Article\Repositories\ArticleRepository;
 use Illuminate\Support\Facades\Facade;
 
 /**
@@ -19,12 +19,12 @@ use Illuminate\Support\Facades\Facade;
  * @method static array updateRules($collection, $entry)
  * @method static void substitute($entry)
  *
- * @see \Abi\Article\Repositories\ArticleEntryRepository
+ * @see \Abi\Article\Repositories\ArticleRepository
  */
-class ArticleEntry extends Facade
+class Article extends Facade
 {
     protected static function getFacadeAccessor()
     {
-        return ArticleEntryRepository::class;
+        return ArticleRepository::class;
     }
 }

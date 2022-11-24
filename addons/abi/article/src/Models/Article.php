@@ -2,7 +2,7 @@
 
 namespace Abi\Article\Models;
 
-use Abi\Article\Entries\ArticleEntryQueryBuilder;
+use Abi\Article\Entries\ArticleQueryBuilder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 
@@ -28,7 +28,7 @@ class Article extends Model
         // Because the import script was importing `updated_at` into the
         // json data column, we will explicitly reference other SQL
         // columns first to prevent errors with that bad data.
-        if (in_array($key, ArticleEntryQueryBuilder::COLUMNS)) {
+        if (in_array($key, ArticleQueryBuilder::COLUMNS)) {
             return parent::getAttribute($key);
         }
 

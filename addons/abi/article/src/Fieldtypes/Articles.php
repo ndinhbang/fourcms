@@ -2,8 +2,8 @@
 
 namespace Abi\Article\Fieldtypes;
 
-use Abi\Article\Facades\ArticleEntry;
-use Abi\Article\Models\Article;
+use Abi\Article\Facades\Article;
+use Abi\Article\Models\Article as ArticleModel;
 use Statamic\CP\Column;
 use Statamic\Facades\Collection;
 use Statamic\Fieldtypes\Relationship;
@@ -21,7 +21,7 @@ class Articles extends Relationship
      */
     protected function toItemArray($id, $site = null)
     {
-        if ($article = Article::find($id)) {
+        if ($article = ArticleModel::find($id)) {
             return [
                 'title' => $article->data['title'],
                 'id' => $article->id,
@@ -38,7 +38,7 @@ class Articles extends Relationship
      */
     public function getIndexItems($request)
     {
-        return Article::all()->map(function ($article) {
+        return ArticleModel::all()->map(function ($article) {
             return [
                 'id' => $article->id,
                 'title' => $article->data['title'],

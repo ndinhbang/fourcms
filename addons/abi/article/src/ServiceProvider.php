@@ -2,7 +2,7 @@
 
 namespace Abi\Article;
 
-use Abi\Article\Entries\ArticleEntryQueryBuilder;
+use Abi\Article\Entries\ArticleQueryBuilder;
 use Abi\Article\Models\Article;
 use Statamic\Facades\CP\Nav;
 use Statamic\Facades\Permission;
@@ -141,8 +141,8 @@ class ServiceProvider extends AddonServiceProvider
      */
     public function register()
     {
-        $this->app->bind(ArticleEntryQueryBuilder::class, function () {
-            return new ArticleEntryQueryBuilder(Article::query());
+        $this->app->bind(ArticleQueryBuilder::class, function () {
+            return new ArticleQueryBuilder(Article::query());
         });
     }
 }

@@ -2,8 +2,8 @@
 
 namespace Abi\Article\Http\Resources;
 
+use App\Facades\Action;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Abi\Article\Facades\Action;
 use Statamic\Facades\User;
 
 /**

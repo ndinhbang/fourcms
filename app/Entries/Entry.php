@@ -21,7 +21,7 @@ abstract class Entry extends FileEntry
      * Override as your need
      * @return mixed
      */
-    public static function fromModel(Model $model)
+    public static function fromModel(Model $model): static
     {
         $entry = (new static())
             ->origin($model->origin_id)

@@ -2,7 +2,7 @@
 
 namespace Abi\Aricle\Http\Controllers;
 
-use Abi\Article\Facades\ArticleEntry;
+use Abi\Article\Facades;
 use Illuminate\Http\Request;
 //use Statamic\Contracts\Entries\Entry as EntryContract;
 use Statamic\Exceptions\CollectionNotFoundException;
@@ -44,7 +44,7 @@ class ArticlePreviewController extends PreviewController
 
         $values = array_except($fields->values()->all(), ['slug']);
 
-        $entry = ArticleEntry::make()
+        $entry = Facades\Article::make()
             ->slug($preview['slug'] ?? 'slug')
             ->collection($this->collection)
             ->locale($site->handle())

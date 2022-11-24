@@ -2,16 +2,16 @@
 
 namespace Abi\Article\Http\Controllers;
 
-use Abi\Article\Facades\ArticleEntry;
-use Abi\Article\Http\Requests\IndexRequest;
+//use Statamic\Contracts\Entries\Entry as EntryContract;
+use Abi\Article\Facades;
 use Abi\Article\Http\Resources\ArticleCollection;
 use Abi\Article\Http\Resources\ArticleResource;
-use Abi\Article\Models\Article;
+use Abi\Article\Models\Article as ArticleModel;
+use Abi\Article\Entries\Article;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Validation\ValidationException;
 use LogicException;
-use Statamic\Contracts\Entries\Entry as EntryContract;
 use Statamic\CP\Breadcrumbs;
 use Statamic\Exceptions\BlueprintNotFoundException;
 use Statamic\Exceptions\CollectionNotFoundException;
@@ -56,7 +56,7 @@ class ArticleController extends CpController
      * @see \Statamic\Http\Controllers\CP\Collections\CollectionsController::show
      * @throws \Throwable
      */
-    public function index(IndexRequest $request)
+    public function index(Request $request)
     {
 //        $this->authorize('view', $collection, __('You are not authorized to view this collection.'));
 
@@ -109,7 +109,7 @@ class ArticleController extends CpController
 
 
 
-        $count = ArticleEntry::query()->count();
+        $count = Facades\Article::query()->count();
         if ($count === 0) {
             return view('article::empty', $viewData);
         }
@@ -167,7 +167,7 @@ class ArticleController extends CpController
     protected function indexQuery($collection)
     {
 //        $query = $collection->queryEntries();
-        $query = ArticleEntry::query();
+        $query = Facades\Article::query();
         if ($search = request('search')) {
             if ($collection->hasSearchIndex()) {
                 return $collection->searchIndex()->ensureExists()->search($search);
@@ -302,7 +302,7 @@ class ArticleController extends CpController
 
         $fields
             ->validator()
-            ->withRules(ArticleEntry::createRules($this->collection, $site))
+            ->withRules(Facades\Article::createRules($this->collection, $site))
             ->withReplacements([
                 'collection' => $this->collection->handle(),
                 'site' => $site->handle(),
@@ -319,7 +319,7 @@ class ArticleController extends CpController
         // todo: customize logic to save data to db
         // ex: take some data to save to pivot table
 
-        $entry = ArticleEntry::make()
+        $entry = Facades\Article::make()
             ->collection($this->collection)
             ->blueprint($request->_blueprint)
             ->locale($site->handle())
@@ -462,7 +462,7 @@ class ArticleController extends CpController
             return;
         }
 
-        $existing = ArticleEntry::findByUri($uri, $entry->locale());
+        $existing = Facades\Article::findByUri($uri, $entry->locale());
 
         if (! $existing || $existing->id() === $entry->id()) {
             return;
@@ -476,10 +476,10 @@ class ArticleController extends CpController
      */
     public function edit(Request $request, $id)
     {
-        $article = Article::findOrFail($id);
+        $article = ArticleModel::findOrFail($id);
 
-        /**@var \Abi\Article\Entries\ArticleEntry $entry*/
-        $entry = \Abi\Article\Entries\ArticleEntry::fromModel($article);
+        /**@var \Abi\Article\Entries\Article $entry*/
+        $entry = Article::fromModel($article);
 
 //        $this->authorize('view', $entry);
 
@@ -575,10 +575,10 @@ class ArticleController extends CpController
     {
 //        $this->authorize('update', $entry);
 
-        $article = Article::findOrFail($id);
+        $article = ArticleModel::findOrFail($id);
 
-        /**@var \Abi\Article\Entries\ArticleEntry $entry*/
-        $entry = \Abi\Article\Entries\ArticleEntry::fromModel($article);
+        /**@var \Abi\Article\Entries\Article $entry*/
+        $entry = Article::fromModel($article);
 
         $entry = $entry->fromWorkingCopy();
 
@@ -598,7 +598,7 @@ class ArticleController extends CpController
 
         $fields
             ->validator()
-            ->withRules(ArticleEntry::updateRules($this->collection, $entry))
+            ->withRules(Article::updateRules($this->collection, $entry))
             ->withReplacements([
                 'id' => $entry->id(),
                 'collection' => $this->collection->handle(),
@@ -661,12 +661,12 @@ class ArticleController extends CpController
 
     public function destroy($id)
     {
-        if (! $article = Article::find($id)) {
+        if (! $article = ArticleModel::find($id)) {
             return $this->pageNotFound();
         }
 
-        /**@var \Abi\Article\Entries\ArticleEntry $entry*/
-        $entry = \Abi\Article\Entries\ArticleEntry::fromModel($article);
+        /**@var \Abi\Article\Entries\Article $entry*/
+        $entry = Article::fromModel($article);
 
 //        $this->authorize('delete', $entry);
 
@@ -674,167 +674,4 @@ class ArticleController extends CpController
 
         return response('', 204);
     }
-//
-//    public function edit(EditRequest $request, $resourceHandle, $record)
-//    {
-//        $resource = Runway::findResource($resourceHandle);
-//        $record = $resource->model()->where($resource->routeKey(), $record)->first();
-//
-//        $values = [];
-//        $blueprintFieldKeys = $resource->blueprint()->fields()->all()->keys()->toArray();
-//
-//        foreach ($blueprintFieldKeys as $fieldKey) {
-//            $value = $record->{$fieldKey};
-//
-//            if ($value instanceof CarbonInterface) {
-//                $format = $defaultFormat = 'Y-m-d H:i';
-//
-//                if ($field = $resource->blueprint()->field($fieldKey)) {
-//                    $format = $field->get('format', $defaultFormat);
-//                }
-//
-//                $value = $value->format($format);
-//            }
-//
-//            if (Json::isJson($value)) {
-//                $value = json_decode($value, true);
-//            }
-//
-//            $values[$fieldKey] = $value;
-//        }
-//
-//        $blueprint = $resource->blueprint();
-//        $fields = $blueprint->fields()->addValues($values)->preProcess();
-//
-//        $viewData = [
-//            'title' => "Edit {$resource->singular()}",
-//            'action' => cp_route('runway.update', [
-//                'resourceHandle'  => $resource->handle(),
-//                'record' => $record->{$resource->routeKey()},
-//            ]),
-//            'method' => 'PATCH',
-//            'breadcrumbs' => new Breadcrumbs([
-//                [
-//                    'text' => $resource->plural(),
-//                    'url' => cp_route('runway.index', [
-//                        'resourceHandle' => $resource->handle(),
-//                    ]),
-//                ],
-//            ]),
-//            'resource' => $resource,
-//            'blueprint' => $blueprint->toPublishArray(),
-//            'values' => $fields->values(),
-//            'meta' => $fields->meta(),
-//            'permalink' => $resource->hasRouting()
-//                ? $record->uri()
-//                : null,
-//            'resourceHasRoutes' => $resource->hasRouting(),
-//            'currentRecord' => [
-//                'id'    => $record->getKey(),
-//                'title' => $record->{collect($resource->listableColumns())->first()},
-//                'edit_url' => $request->url(),
-//            ],
-//        ];
-//
-//        if ($request->wantsJson()) {
-//            return $viewData;
-//        }
-//
-//        return view('runway::edit', $viewData);
-//    }
-//
-//    public function update(UpdateRequest $request, $resourceHandle, $record)
-//    {
-//        $resource = Runway::findResource($resourceHandle);
-//        $record = $resource->model()->where($resource->routeKey(), $record)->first();
-//
-//        foreach ($resource->blueprint()->fields()->all() as $fieldKey => $field) {
-//            $processedValue = $field->fieldtype()->process($request->get($fieldKey));
-//
-//            if ($field->type() === 'section' || $field->type() === 'has_many') {
-//                continue;
-//            }
-//
-//            if (is_array($processedValue) && ! $record->hasCast($fieldKey, ['json', 'array', 'collection', 'object', 'encrypted:array', 'encrypted:collection', 'encrypted:object'])) {
-//                $processedValue = json_encode($processedValue);
-//            }
-//
-//            $record->{$fieldKey} = $processedValue;
-//        }
-//
-//        $record->save();
-//
-//        if ($request->get('from_inline_publish_form')) {
-//            // In the case of the 'Relationship' fields in Table Mode, when a model is updated
-//            // in the stack, we also need to return it's relations.
-//            collect($resource->blueprint()->fields()->all())
-//                ->filter(function (Field $field) {
-//                    return $field->type() === 'belongs_to'
-//                        || $field->type() === 'has_many';
-//                })
-//                ->each(function (Field $field) use (&$record) {
-//                    $relatedResource = Runway::findResource($field->get('resource'));
-//
-//                    $column = $relatedResource->listableColumns()[0];
-//
-//                    $record->{$field->handle()} = $record->{$field->handle()}()
-//                        ->select('id', $column)
-//                        ->get()
-//                        ->each(function ($model) use ($relatedResource, $column) {
-//                            $model->title = $model->{$column};
-//
-//                            $model->edit_url = cp_route('runway.edit', [
-//                                'resourceHandle' => $relatedResource->handle(),
-//                                'record' => $model->{$relatedResource->routeKey()},
-//                            ]);
-//
-//                            return $model;
-//                        });
-//                });
-//        }
-//
-//        return [
-//            'data' => $this->getReturnData($resource, $record),
-//        ];
-//    }
-//
-//    /**
-//     * This method is a duplicate of code in the `ArticleListingController`.
-//     * Update both if you make any changes.
-//     */
-//    protected function buildColumns(Resource $resource, $blueprint)
-//    {
-//        $preferredFirstColumn = isset(User::current()->preferences()['runway'][$resource->handle()]['columns'])
-//            ? User::current()->preferences()['runway'][$resource->handle()]['columns'][0]
-//            : $resource->listableColumns()[0];
-//
-//        return collect($resource->listableColumns())
-//            ->map(function ($columnKey) use ($blueprint, $preferredFirstColumn) {
-//                $field = $blueprint->field($columnKey);
-//
-//                return [
-//                    'handle' => $columnKey,
-//                    'title' => $field
-//                        ? $field->display()
-//                        : $field,
-//                    'has_link' => $preferredFirstColumn === $columnKey,
-//                    'is_primary_column' => $preferredFirstColumn === $columnKey,
-//                ];
-//            })
-//            ->toArray();
-//    }
-//
-//    /**
-//     * Build an array with the correct return data for the inline publish forms.
-//     */
-//    protected function getReturnData($resource, $record)
-//    {
-//        return array_merge($record->toArray(), [
-//            'title' => $record->{$resource->listableColumns()[0]},
-//            'edit_url' => cp_route('runway.edit', [
-//                'resourceHandle'  => $resource->handle(),
-//                'record' => $record->{$resource->routeKey()},
-//            ]),
-//        ]);
-//    }
 }
