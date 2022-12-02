@@ -117,13 +117,16 @@ export default {
         reordering: Boolean,
         reorderUrl: String,
         site: String,
+        initPreferencesPrefix: String,
+        requestUrl: String,
+
     },
 
     data() {
         return {
             listingKey: 'entries',
-            preferencesPrefix: `collections.${this.collection}`,
-            requestUrl: cp_url(`collections/${this.collection}/entries`),
+            preferencesPrefix: this.initPreferencesPrefix || `collections.${this.collection}`,
+            // requestUrl: this.requestUrl || cp_url(`collections/${this.collection}/entries`),
             currentSite: this.site,
             initialSite: this.site,
         }

@@ -108,6 +108,7 @@ Statamic.app({
     store: Statamic.$store,
 
     components: {
+        CustomEntryCreateForm: require('./components/custom-entries/BaseCreateForm.vue').default,
         GlobalSearch: require('./components/GlobalSearch.vue').default,
         GlobalSiteSelector: require('./components/GlobalSiteSelector.vue').default,
         Login: require('./components/login/login'),
@@ -138,6 +139,7 @@ Statamic.app({
         CollectionScaffolder: require('./components/collections/Scaffolder.vue').default,
         CollectionEditForm: require('./components/collections/EditForm.vue').default,
         CollectionView: require('./components/collections/View.vue').default,
+        CustomEntryView: require('./components/custom-entries/View.vue').default,
         CollectionBlueprintListing:  require('./components/collections/BlueprintListing.vue').default,
         SessionExpiry: require('./components/SessionExpiry.vue').default,
         NavigationListing: require('./components/navigation/Listing.vue').default,

@@ -6,7 +6,7 @@
 
 @section('content')
 
-    <article-view
+    <custom-entry-view
         title="{{ $collection->title() }}"
         handle="{{ $collection->handle() }}"
         breadcrumb-url="{{ cp_route('collections.index') }}"
@@ -19,6 +19,7 @@
         :columns="{{ $columns->toJson() }}"
         :filters="{{ $filters->toJson() }}"
         action-url="{{ cp_route('article.actions.run') }}"
+        request-url="{{ cp_route('article.list') }}"
         reorder-url="{{ cp_route('collections.entries.reorder', $collection->handle()) }}"
         initial-site="{{ $site }}"
         :sites="{{ json_encode($sites) }}"
@@ -53,6 +54,6 @@
                 </dropdown-item>
             @endcan
         </template>
-    </article-view>
+    </custom-entry-view>
 
 @endsection

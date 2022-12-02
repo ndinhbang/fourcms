@@ -25,6 +25,7 @@ Vue.component('form-group', require('../components/publish/FormGroup.vue').defau
 Vue.component('live-preview', require('../components/live-preview/LivePreview.vue').default);
 Vue.component('live-preview-popout', require('../components/live-preview/Popout.vue').default);
 
+Vue.component('CustomEntryPublishForm', require('../components/custom-entries/PublishForm.vue').default);
 Vue.component('EntryPublishForm', require('../components/entries/PublishForm.vue').default);
 Vue.component('TermPublishForm', require('../components/terms/PublishForm.vue').default);
 Vue.component('UserPublishForm', require('../components/users/PublishForm.vue').default);
@@ -42,6 +43,7 @@ Vue.component('data-list-filters', require('../components/data-list/Filters.vue'
 Vue.component('data-list-filter-presets', require('../components/data-list/FilterPresets.vue').default);
 
 // Resource Type Lists
+Vue.component('custom-entry-list', require('../components/custom-entries/Listing.vue').default);
 Vue.component('entry-list', require('../components/entries/Listing.vue').default);
 Vue.component('collection-list', require('../components/collections/Listing.vue').default);
 Vue.component('taxonomy-list', require('../components/taxonomies/Listing.vue').default);

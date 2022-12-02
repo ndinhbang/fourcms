@@ -3,7 +3,7 @@
 @section('wrapper_class', 'max-w-3xl')
 
 @section('content')
-    <article-create-form
+    <custom-entry-create-form
         :actions="{{ json_encode($actions) }}"
         collection-handle="{{ $collection }}"
         collection-create-label="{{ $collectionCreateLabel }}"
@@ -20,5 +20,5 @@
         listing-url="{{ cp_route('article.index') }}"
         :can-manage-publish-state="{{ Statamic\Support\Str::bool($canManagePublishState) }}"
         :preview-targets="{{ json_encode($previewTargets) }}"
-    ></article-create-form>
+    ></custom-entry-create-form>
 @endsection
